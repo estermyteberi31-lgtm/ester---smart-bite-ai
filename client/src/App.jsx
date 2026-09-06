@@ -33,7 +33,7 @@ export default function App() {
               <Logo className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-semibold leading-none">Myteberi</p>
+              <p className="text-sm font-semibold leading-none">SmartBite AI</p>
               <p className="text-[11px] leading-none text-white/40">{TAB_TITLES[activeTab]}</p>
             </div>
           </div>

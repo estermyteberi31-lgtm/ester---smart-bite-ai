@@ -13,7 +13,7 @@ import { applyAccentColor } from "../lib/colors.js";
 const AppContext = createContext(null);
 
 const DEFAULT_SETTINGS = {
-  name: "Myteberi User",
+  name: "SmartBite User",
   email: "",
   plan: "Free",
   dietary_preferences: [],

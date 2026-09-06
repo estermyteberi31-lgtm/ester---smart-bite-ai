@@ -1,4 +1,4 @@
-# Myteberi
+# SmartBite AI
 
 A mobile-first web app that scans food/grocery photos, generates AI workouts, and tracks
 nutrition, savings, and fitness progress over time.

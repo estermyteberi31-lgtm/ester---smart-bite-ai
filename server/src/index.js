@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Myteberi server listening on http://localhost:${PORT}`);
+  console.log(`SmartBite AI server listening on http://localhost:${PORT}`);
   if (!isAnthropicConfigured()) {
     console.warn(
       "ANTHROPIC_API_KEY is not set. /api/scan and /api/workout will return 503 until it is configured."

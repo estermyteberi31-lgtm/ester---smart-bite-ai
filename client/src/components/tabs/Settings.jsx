@@ -81,7 +81,7 @@ export default function Settings() {
             {(form.name || "M").charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-sm font-semibold">{form.name || "Myteberi User"}</p>
+            <p className="text-sm font-semibold">{form.name || "SmartBite User"}</p>
             <span
               className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
               style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}

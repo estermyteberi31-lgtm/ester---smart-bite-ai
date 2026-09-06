@@ -1,7 +1,7 @@
 {
   "name": "smartbite-ai-client",
   "version": "1.0.0",
-  "description": "Myteberi - mobile-first React frontend",
+  "description": "SmartBite AI - mobile-first React frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",

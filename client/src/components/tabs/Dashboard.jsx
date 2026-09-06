@@ -119,7 +119,7 @@ export default function Dashboard() {
           className="mt-3 w-full rounded-xl py-3 text-sm font-semibold shadow-lg transition-opacity disabled:opacity-50"
           style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
         >
-          {loading ? "Analyzing..." : "Scan with Myteberi"}
+          {loading ? "Analyzing..." : "Scan with SmartBite AI"}
         </button>
 
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}

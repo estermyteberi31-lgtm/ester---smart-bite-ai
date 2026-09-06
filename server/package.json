@@ -1,7 +1,7 @@
 {
   "name": "smartbite-ai-server",
   "version": "1.0.0",
-  "description": "Myteberi backend - Express API server for receipt/food scanning, workout generation, and progress tracking",
+  "description": "SmartBite AI backend - Express API server for receipt/food scanning, workout generation, and progress tracking",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
