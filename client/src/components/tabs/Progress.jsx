@@ -31,9 +31,9 @@ export default function Progress() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
         <h2 className="text-base font-semibold">Your trends</h2>
-        <p className="text-xs text-white/40">Last {progressSeries.length || 14} days</p>
+        <p className="text-xs text-black/40">Last {progressSeries.length || 14} days</p>
         <div className="mt-3">
           <ProgressChart series={progressSeries} />
         </div>
@@ -45,17 +45,17 @@ export default function Progress() {
         <MiniStat color="#3b82f6" label="Workouts" value={latest.workoutsCompleted} />
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-white/80">Hydration</h3>
-            <p className="text-xs text-white/40">{hydrationToday} glasses today</p>
+            <h3 className="text-sm font-semibold text-black/80">Hydration</h3>
+            <p className="text-xs text-black/40">{hydrationToday} glasses today</p>
           </div>
           <button
             type="button"
             onClick={handleDroplet}
             disabled={dropletBusy}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/15 text-blue-300 transition-transform active:scale-90 disabled:opacity-60"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-black/10 bg-black/[0.03] text-black transition-transform active:scale-90 disabled:opacity-60"
             aria-label="Log a glass of water"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7">
@@ -77,11 +77,11 @@ export default function Progress() {
 
 function MiniStat({ color, label, value }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
+    <div className="rounded-xl border border-black/10 bg-white p-3 text-center">
       <p className="text-lg font-semibold" style={{ color }}>
         {value}
       </p>
-      <p className="text-[10px] uppercase tracking-wide text-white/40">{label}</p>
+      <p className="text-[10px] uppercase tracking-wide text-black/40">{label}</p>
     </div>
   );
 }

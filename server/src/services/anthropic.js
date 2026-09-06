@@ -53,7 +53,7 @@ export async function analyzeFoodImage({ base64Image, mediaType, chatMessage, gy
     ? `The user added this note about the photo: "${chatMessage.trim()}"`
     : "The user did not add any extra note.";
 
-  const systemPrompt = `You are the SmartBite AI vision engine. You analyze photos of meals, groceries, or
+  const systemPrompt = `You are the Myteberi vision engine. You analyze photos of meals, groceries, or
 receipts and return ONLY a single JSON object (no prose, no markdown fences) matching exactly this shape:
 
 {
@@ -117,7 +117,7 @@ export async function generateWorkout({ mode, style, profile }) {
       ? "Full commercial gym equipment is available: barbells, dumbbells, machines, cable stations, benches."
       : "No equipment is available. Bodyweight-only exercises, optionally using a chair, wall, or floor space at home.";
 
-  const systemPrompt = `You are the SmartBite AI workout engine. Return ONLY a single JSON object (no prose,
+  const systemPrompt = `You are the Myteberi workout engine. Return ONLY a single JSON object (no prose,
 no markdown fences) matching exactly this shape:
 
 {

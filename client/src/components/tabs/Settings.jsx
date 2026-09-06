@@ -55,14 +55,14 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 text-lg font-bold">
-            {(form.name || "S").charAt(0).toUpperCase()}
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-white text-lg font-bold text-black">
+            {(form.name || "M").charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-sm font-semibold">{form.name || "SmartBite User"}</p>
-            <span className="mt-0.5 inline-block rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-semibold text-purple-300">
+            <p className="text-sm font-semibold">{form.name || "Myteberi User"}</p>
+            <span className="mt-0.5 inline-block rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold text-white">
               {form.plan || "Free"} plan
             </span>
           </div>
@@ -89,8 +89,8 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <h3 className="text-sm font-semibold text-white/80">Dietary preferences</h3>
+      <section className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
+        <h3 className="text-sm font-semibold text-black/80">Dietary preferences</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {DIET_OPTIONS.map((option) => {
             const active = (form.dietary_preferences ?? []).includes(option);
@@ -100,7 +100,7 @@ export default function Settings() {
                 type="button"
                 onClick={() => toggleDiet(option)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active ? "bg-purple-600 text-white" : "bg-white/5 text-white/50"
+                  active ? "bg-black text-white" : "bg-black/5 text-black/50"
                 }`}
               >
                 {option}
@@ -110,8 +110,8 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <h3 className="text-sm font-semibold text-white/80">Goals</h3>
+      <section className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
+        <h3 className="text-sm font-semibold text-black/80">Goals</h3>
         <div className="mt-3 flex flex-col gap-3">
           <Field label="Daily calorie goal">
             <input
@@ -149,7 +149,7 @@ export default function Settings() {
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 py-3 text-sm font-semibold shadow-lg shadow-purple-900/40 disabled:opacity-50"
+        className="rounded-xl bg-black py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 disabled:opacity-50"
       >
         {saving ? "Saving..." : "Save settings"}
       </button>
@@ -162,7 +162,7 @@ export default function Settings() {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-white/50">{label}</span>
+      <span className="mb-1 block text-xs font-medium text-black/50">{label}</span>
       {children}
     </label>
   );

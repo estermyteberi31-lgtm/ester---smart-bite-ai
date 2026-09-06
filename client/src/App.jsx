@@ -1,5 +1,6 @@
 import { useAppContext } from "./context/AppContext.jsx";
 import NavBar from "./components/NavBar.jsx";
+import Logo from "./components/Logo.jsx";
 import Dashboard from "./components/tabs/Dashboard.jsx";
 import Workouts from "./components/tabs/Workouts.jsx";
 import Progress from "./components/tabs/Progress.jsx";
@@ -24,16 +25,16 @@ export default function App() {
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] ?? Dashboard;
 
   return (
-    <div className="min-h-screen bg-[#0f0b1a] text-white">
+    <div className="min-h-screen bg-white text-black">
       <div className="mx-auto flex min-h-screen max-w-md flex-col">
-        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#0f0b1a]/90 px-5 py-4 backdrop-blur">
+        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-black/10 bg-white/90 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-sm font-bold">
-              SB
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-black/10 bg-white">
+              <Logo className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-semibold leading-none">SmartBite AI</p>
-              <p className="text-[11px] leading-none text-white/40">{TAB_TITLES[activeTab]}</p>
+              <p className="text-sm font-semibold leading-none">Myteberi</p>
+              <p className="text-[11px] leading-none text-black/40">{TAB_TITLES[activeTab]}</p>
             </div>
           </div>
         </header>

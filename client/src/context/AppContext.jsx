@@ -11,7 +11,7 @@ import {
 const AppContext = createContext(null);
 
 const DEFAULT_SETTINGS = {
-  name: "SmartBite User",
+  name: "Myteberi User",
   email: "",
   plan: "Free",
   dietary_preferences: [],

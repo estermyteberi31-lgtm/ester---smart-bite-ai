@@ -18,7 +18,7 @@ db.pragma("foreign_keys = ON");
 db.exec(`
   CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL DEFAULT 'SmartBite User',
+    name TEXT NOT NULL DEFAULT 'Myteberi User',
     email TEXT,
     plan TEXT NOT NULL DEFAULT 'Free',
     dietary_preferences TEXT NOT NULL DEFAULT '[]',
@@ -77,7 +77,7 @@ function ensureDefaultAccount() {
        VALUES (@name, @email, @plan, @dietary_preferences, @calorie_goal, @weekly_budget, @preferred_gym_mode)`
     )
     .run({
-      name: "SmartBite User",
+      name: "Myteberi User",
       email: null,
       plan: "Free",
       dietary_preferences: JSON.stringify([]),
