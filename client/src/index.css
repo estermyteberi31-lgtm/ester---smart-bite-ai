@@ -6,6 +6,13 @@
   --color-brand-blue: #2563eb;
 }
 
+:root {
+  /* Default neon accent (Purple) — overridden at runtime from the user's
+     saved preference via applyAccentColor() in lib/colors.js. */
+  --accent: #a855f7;
+  --accent-contrast: #ffffff;
+}
+
 html,
 body,
 #root {
@@ -13,7 +20,7 @@ body,
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #0f0b1a;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
 }
@@ -29,6 +36,9 @@ body {
 
 @layer components {
   .input {
-    @apply w-full rounded-xl border border-black/15 bg-black/[0.03] p-3 text-sm text-black placeholder:text-black/30 focus:border-black focus:outline-none;
+    @apply w-full rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white placeholder:text-white/30 focus:outline-none;
+  }
+  .input:focus {
+    border-color: var(--accent);
   }
 }

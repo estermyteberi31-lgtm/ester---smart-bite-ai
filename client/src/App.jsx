@@ -25,16 +25,16 @@ export default function App() {
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] ?? Dashboard;
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-[#0f0b1a] text-white">
       <div className="mx-auto flex min-h-screen max-w-md flex-col">
-        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-black/10 bg-white/90 px-5 py-4 backdrop-blur">
+        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#0f0b1a]/90 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-black/10 bg-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black">
               <Logo className="h-6 w-6" />
             </div>
             <div>
               <p className="text-sm font-semibold leading-none">Myteberi</p>
-              <p className="text-[11px] leading-none text-black/40">{TAB_TITLES[activeTab]}</p>
+              <p className="text-[11px] leading-none text-white/40">{TAB_TITLES[activeTab]}</p>
             </div>
           </div>
         </header>

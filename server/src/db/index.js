@@ -25,6 +25,7 @@ db.exec(`
     calorie_goal INTEGER NOT NULL DEFAULT 2200,
     weekly_budget REAL NOT NULL DEFAULT 60,
     preferred_gym_mode TEXT NOT NULL DEFAULT 'home',
+    accent_color TEXT NOT NULL DEFAULT 'purple',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -68,13 +69,25 @@ db.exec(`
   );
 `);
 
+// Adds columns introduced after a user's local database was first created,
+// since CREATE TABLE IF NOT EXISTS never alters an existing table.
+function ensureColumn(table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all();
+  const hasColumn = columns.some((col) => col.name === column);
+  if (!hasColumn) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
+ensureColumn("accounts", "accent_color", "TEXT NOT NULL DEFAULT 'purple'");
+
 function ensureDefaultAccount() {
   const existing = db.prepare("SELECT id FROM accounts ORDER BY id ASC LIMIT 1").get();
   if (existing) return existing.id;
   const result = db
     .prepare(
-      `INSERT INTO accounts (name, email, plan, dietary_preferences, calorie_goal, weekly_budget, preferred_gym_mode)
-       VALUES (@name, @email, @plan, @dietary_preferences, @calorie_goal, @weekly_budget, @preferred_gym_mode)`
+      `INSERT INTO accounts (name, email, plan, dietary_preferences, calorie_goal, weekly_budget, preferred_gym_mode, accent_color)
+       VALUES (@name, @email, @plan, @dietary_preferences, @calorie_goal, @weekly_budget, @preferred_gym_mode, @accent_color)`
     )
     .run({
       name: "Myteberi User",
@@ -84,6 +97,7 @@ function ensureDefaultAccount() {
       calorie_goal: 2200,
       weekly_budget: 60,
       preferred_gym_mode: "home",
+      accent_color: "purple",
     });
   return result.lastInsertRowid;
 }

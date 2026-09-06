@@ -6,7 +6,9 @@ import {
   logHydrationClick as apiLogHydration,
   fetchProgressSeries,
   fetchWorkoutHistory,
+  fetchStreak,
 } from "../lib/api.js";
+import { applyAccentColor } from "../lib/colors.js";
 
 const AppContext = createContext(null);
 
@@ -18,7 +20,10 @@ const DEFAULT_SETTINGS = {
   calorie_goal: 2200,
   weekly_budget: 60,
   preferred_gym_mode: "home",
+  accent_color: "purple",
 };
+
+const DEFAULT_STREAK = { currentStreak: 0, unlockAt: 7, colorsUnlocked: false };
 
 export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -28,12 +33,14 @@ export function AppProvider({ children }) {
   const [progressSeries, setProgressSeries] = useState([]);
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [streak, setStreak] = useState(DEFAULT_STREAK);
 
   const refreshSettings = useCallback(async () => {
     try {
       const data = await fetchSettings();
       setSettings(data);
       setGymMode(data.preferred_gym_mode === "gym" ? "gym" : "home");
+      applyAccentColor(data.accent_color);
     } catch {
       // Keep defaults if the backend/db isn't reachable yet.
     } finally {
@@ -41,9 +48,19 @@ export function AppProvider({ children }) {
     }
   }, []);
 
+  const refreshStreak = useCallback(async () => {
+    try {
+      const data = await fetchStreak();
+      setStreak(data);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const saveSettings = useCallback(async (payload) => {
     const updated = await apiUpdateSettings(payload);
     setSettings(updated);
+    applyAccentColor(updated.accent_color);
     return updated;
   }, []);
 
@@ -85,7 +102,8 @@ export function AppProvider({ children }) {
     refreshHydration();
     refreshProgressSeries();
     refreshWorkoutHistory();
-  }, [refreshSettings, refreshHydration, refreshProgressSeries, refreshWorkoutHistory]);
+    refreshStreak();
+  }, [refreshSettings, refreshHydration, refreshProgressSeries, refreshWorkoutHistory, refreshStreak]);
 
   const value = useMemo(
     () => ({
@@ -104,6 +122,8 @@ export function AppProvider({ children }) {
       refreshProgressSeries,
       workoutHistory,
       refreshWorkoutHistory,
+      streak,
+      refreshStreak,
     }),
     [
       activeTab,
@@ -119,6 +139,8 @@ export function AppProvider({ children }) {
       refreshProgressSeries,
       workoutHistory,
       refreshWorkoutHistory,
+      streak,
+      refreshStreak,
     ]
   );
 

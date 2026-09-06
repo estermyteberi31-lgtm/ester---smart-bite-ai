@@ -28,7 +28,7 @@ function buildPoints(series, key) {
 export default function ProgressChart({ series }) {
   if (!series || series.length === 0) {
     return (
-      <div className="flex h-[170px] items-center justify-center text-xs text-black/30">
+      <div className="flex h-[170px] items-center justify-center text-xs text-white/30">
         No data yet — scan a meal or complete a workout to see your trends.
       </div>
     );
@@ -41,14 +41,14 @@ export default function ProgressChart({ series }) {
     <div>
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label="Progress over time">
         {gridY.map((y, idx) => (
-          <line key={idx} x1={PAD_X} x2={WIDTH - PAD_X} y1={y} y2={y} stroke="#000000" strokeOpacity="0.08" strokeWidth="1" />
+          <line key={idx} x1={PAD_X} x2={WIDTH - PAD_X} y1={y} y2={y} stroke="#ffffff" strokeOpacity="0.06" strokeWidth="1" />
         ))}
 
         {tickIndexes.map((idx) => {
           const point = series[idx];
           const x = PAD_X + (WIDTH - PAD_X * 2) * (series.length > 1 ? idx / (series.length - 1) : 0);
           return (
-            <text key={idx} x={x} y={HEIGHT - 6} fontSize="7" textAnchor="middle" fill="#00000066">
+            <text key={idx} x={x} y={HEIGHT - 6} fontSize="7" textAnchor="middle" fill="#ffffff66">
               {formatDay(point.day)}
             </text>
           );
@@ -70,7 +70,7 @@ export default function ProgressChart({ series }) {
 
       <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
         {LINES.map((line) => (
-          <div key={line.key} className="flex items-center gap-1.5 text-[10px] text-black/50">
+          <div key={line.key} className="flex items-center gap-1.5 text-[10px] text-white/50">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: line.color }} />
             {line.label}
           </div>

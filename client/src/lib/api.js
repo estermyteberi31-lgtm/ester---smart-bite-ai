@@ -65,6 +65,11 @@ export async function fetchBudget() {
   return handleResponse(res);
 }
 
+export async function fetchStreak() {
+  const res = await fetch(`${BASE_URL}/progress/streak`);
+  return handleResponse(res);
+}
+
 export async function fetchSettings() {
   const res = await fetch(`${BASE_URL}/settings`);
   return handleResponse(res);

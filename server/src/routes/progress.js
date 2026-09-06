@@ -1,7 +1,17 @@
 import { Router } from "express";
 import { db, DEFAULT_ACCOUNT_ID } from "../db/index.js";
+import { computeCurrentStreak, STREAK_UNLOCK_DAYS } from "../services/streak.js";
 
 const router = Router();
+
+router.get("/streak", (req, res) => {
+  const currentStreak = computeCurrentStreak(DEFAULT_ACCOUNT_ID);
+  res.json({
+    currentStreak,
+    unlockAt: STREAK_UNLOCK_DAYS,
+    colorsUnlocked: currentStreak >= STREAK_UNLOCK_DAYS,
+  });
+});
 
 const insertHydration = db.prepare(
   `INSERT INTO hydration_logs (account_id) VALUES (?)`
