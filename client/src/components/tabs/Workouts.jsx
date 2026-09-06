@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import { generateWorkout, completeWorkout } from "../../lib/api.js";
+import { celebrate } from "../../lib/confetti.js";
 
 const STYLES = ["Weight Lifting", "Cardio / Running", "Full Body Toning"];
 
@@ -46,6 +47,7 @@ export default function Workouts() {
         style: workout.style ?? style,
       });
       setCompleted(true);
+      celebrate();
       refreshWorkoutHistory();
       refreshProgressSeries();
     } catch (err) {
@@ -57,7 +59,7 @@ export default function Workouts() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <h2 className="text-base font-semibold">Today's workout</h2>
 
         <div className="mt-3 flex items-center justify-between rounded-xl bg-black/20 p-1">
@@ -90,17 +92,26 @@ export default function Workouts() {
           type="button"
           onClick={handleGenerate}
           disabled={loading}
-          className="mt-4 w-full rounded-xl py-3 text-sm font-semibold shadow-lg disabled:opacity-50"
+          className="glow-accent mt-4 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
           style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
         >
-          {loading ? "Generating..." : "Generate Workout Today"}
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Generating...
+            </span>
+          ) : (
+            "Generate Workout Today"
+          )}
         </button>
 
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </section>
 
+      {loading && !workout && <WorkoutSkeleton />}
+
       {workout && (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <h3 className="text-base font-semibold" style={{ color: "var(--accent)" }}>
             {workout.title}
           </h3>
@@ -131,7 +142,7 @@ export default function Workouts() {
             type="button"
             onClick={handleComplete}
             disabled={completing || completed}
-            className={`mt-4 w-full rounded-xl py-3 text-sm font-semibold transition-colors ${
+            className={`mt-4 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
               completed ? "bg-green-600/30 text-green-300" : "bg-green-600 text-white"
             } disabled:opacity-70`}
           >
@@ -141,7 +152,7 @@ export default function Workouts() {
       )}
 
       {workoutHistory.length > 0 && (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
           <h3 className="text-sm font-semibold text-white/80">Recent workouts</h3>
           <ul className="mt-2 flex flex-col gap-1.5 text-xs text-white/50">
             {workoutHistory.slice(0, 5).map((entry) => (
@@ -157,12 +168,26 @@ export default function Workouts() {
   );
 }
 
+function WorkoutSkeleton() {
+  return (
+    <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="skeleton h-5 w-40 rounded" />
+      <div className="skeleton mt-2 h-3 w-56 rounded" />
+      <div className="mt-4 flex flex-col gap-2.5">
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <div key={idx} className="skeleton h-12 rounded-xl" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ToggleOption({ label, sub, active, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-1 flex-col items-center rounded-lg py-2.5 transition-colors"
+      className="flex flex-1 flex-col items-center rounded-lg py-2.5 transition-all active:scale-95"
       style={active ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" } : { color: "rgba(255,255,255,0.5)" }}
     >
       <span className="text-xs font-semibold">{label}</span>

@@ -29,7 +29,9 @@ export default function App() {
       <div className="mx-auto flex min-h-screen max-w-md flex-col">
         <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#0f0b1a]/90 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black">
+            <div
+              className="glow-accent flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black transition-transform active:scale-95"
+            >
               <Logo className="h-6 w-6" />
             </div>
             <div>

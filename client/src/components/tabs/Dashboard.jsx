@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import { scanImage } from "../../lib/api.js";
+import AnimatedNumber from "../AnimatedNumber.jsx";
 
 export default function Dashboard() {
   const { gymMode, setGymMode, refreshProgressSeries } = useAppContext();
@@ -41,14 +42,14 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold">Scan food or receipt</h2>
           <div className="flex items-center gap-2 rounded-full bg-white/5 p-1 text-[11px]">
             <button
               type="button"
               onClick={() => setGymMode("home")}
-              className="rounded-full px-2.5 py-1 font-medium transition-colors"
+              className="rounded-full px-2.5 py-1 font-medium transition-all active:scale-90"
               style={
                 gymMode === "home"
                   ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }
@@ -60,7 +61,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => setGymMode("gym")}
-              className="rounded-full px-2.5 py-1 font-medium transition-colors"
+              className="rounded-full px-2.5 py-1 font-medium transition-all active:scale-90"
               style={
                 gymMode === "gym"
                   ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }
@@ -75,7 +76,7 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-4 flex h-44 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/15 bg-black/20 text-white/60 transition-colors"
+          className="mt-4 flex h-44 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/15 bg-black/20 text-white/60 transition-all active:scale-[0.98]"
         >
           {previewUrl ? (
             <img src={previewUrl} alt="Selected capture" className="h-full w-full rounded-xl object-cover" />
@@ -116,17 +117,40 @@ export default function Dashboard() {
           type="button"
           onClick={handleScan}
           disabled={loading}
-          className="mt-3 w-full rounded-xl py-3 text-sm font-semibold shadow-lg transition-opacity disabled:opacity-50"
+          className="glow-accent mt-3 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
           style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
         >
-          {loading ? "Analyzing..." : "Scan with SmartBite AI"}
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Analyzing...
+            </span>
+          ) : (
+            "Scan with SmartBite AI"
+          )}
         </button>
 
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </section>
 
+      {loading && !result && <ScanSkeleton />}
       {result && <ScanResults result={result} />}
     </div>
+  );
+}
+
+function ScanSkeleton() {
+  return (
+    <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="skeleton h-4 w-32 rounded" />
+      <div className="mt-3 grid grid-cols-4 gap-2">
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <div key={idx} className="skeleton h-12 rounded-xl" />
+        ))}
+      </div>
+      <div className="skeleton mt-4 h-2.5 rounded-full" />
+      <div className="skeleton mt-4 h-10 rounded-lg" />
+    </section>
   );
 }
 
@@ -138,22 +162,22 @@ function ScanResults({ result }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white/80">Nutrition summary</h3>
           <span
             className="rounded-full px-2.5 py-1 text-xs font-semibold"
             style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
-            Score {result.nutrition_score ?? 0}/100
+            Score <AnimatedNumber value={result.nutrition_score ?? 0} />/100
           </span>
         </div>
 
         <div className="mt-3 grid grid-cols-4 gap-2 text-center">
           <Stat label="Calories" value={totals.calories ?? 0} />
-          <Stat label="Protein" value={`${totals.protein_g ?? 0}g`} />
-          <Stat label="Carbs" value={`${totals.carbs_g ?? 0}g`} />
-          <Stat label="Fat" value={`${totals.fat_g ?? 0}g`} />
+          <Stat label="Protein" value={totals.protein_g ?? 0} suffix="g" />
+          <Stat label="Carbs" value={totals.carbs_g ?? 0} suffix="g" />
+          <Stat label="Fat" value={totals.fat_g ?? 0} suffix="g" />
         </div>
 
         <MacroBar macros={macros} />
@@ -178,7 +202,7 @@ function ScanResults({ result }) {
       </section>
 
       {prices.length > 0 && (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white/80">Tesco vs Aldi</h3>
             {typeof result.estimated_total_savings === "number" && (
@@ -214,10 +238,12 @@ function ScanResults({ result }) {
   );
 }
 
-function Stat({ label, value }) {
+function Stat({ label, value, suffix = "" }) {
   return (
     <div className="rounded-xl bg-black/20 py-2">
-      <p className="text-sm font-semibold">{value}</p>
+      <p className="text-sm font-semibold">
+        <AnimatedNumber value={value} formatter={(n) => `${Math.round(n)}${suffix}`} />
+      </p>
       <p className="text-[10px] uppercase tracking-wide text-white/40">{label}</p>
     </div>
   );
@@ -232,9 +258,12 @@ function MacroBar({ macros }) {
   return (
     <div className="mt-4">
       <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-black/30">
-        <div style={{ width: `${(protein / total) * 100}%`, backgroundColor: "var(--accent)" }} />
-        <div className="bg-blue-500" style={{ width: `${(carbs / total) * 100}%` }} />
-        <div className="bg-amber-500" style={{ width: `${(fat / total) * 100}%` }} />
+        <div
+          className="transition-all duration-700 ease-out"
+          style={{ width: `${(protein / total) * 100}%`, backgroundColor: "var(--accent)" }}
+        />
+        <div className="bg-blue-500 transition-all duration-700 ease-out" style={{ width: `${(carbs / total) * 100}%` }} />
+        <div className="bg-amber-500 transition-all duration-700 ease-out" style={{ width: `${(fat / total) * 100}%` }} />
       </div>
       <div className="mt-1.5 flex justify-between text-[10px] text-white/40">
         <span>Protein {protein}%</span>

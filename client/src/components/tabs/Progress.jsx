@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import ProgressChart from "../ProgressChart.jsx";
 import { fetchBudget } from "../../lib/api.js";
+import AnimatedNumber from "../AnimatedNumber.jsx";
 
 export default function Progress() {
   const { progressSeries, hydrationToday, logHydration } = useAppContext();
@@ -31,7 +32,7 @@ export default function Progress() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <h2 className="text-base font-semibold">Your trends</h2>
         <p className="text-xs text-white/40">Last {progressSeries.length || 14} days</p>
         <div className="mt-3">
@@ -39,13 +40,13 @@ export default function Progress() {
         </div>
       </section>
 
-      <section className="grid grid-cols-3 gap-2">
+      <section className="card-enter grid grid-cols-3 gap-2" style={{ "--delay": "70ms" }}>
         <MiniStat color="#a855f7" label="Nutrition" value={latest.nutritionScore} />
-        <MiniStat color="#22c55e" label="Saved" value={`£${Number(totalSaved).toFixed(2)}`} />
+        <MiniStat color="#22c55e" label="Saved" value={totalSaved} formatter={(n) => `£${n.toFixed(2)}`} />
         <MiniStat color="#3b82f6" label="Workouts" value={latest.workoutsCompleted} />
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "140ms" }}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-white/80">Hydration</h3>
@@ -75,11 +76,11 @@ export default function Progress() {
   );
 }
 
-function MiniStat({ color, label, value }) {
+function MiniStat({ color, label, value, formatter }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
       <p className="text-lg font-semibold" style={{ color }}>
-        {value}
+        <AnimatedNumber value={value} formatter={formatter ? (n) => formatter(n) : undefined} duration={800} />
       </p>
       <p className="text-[10px] uppercase tracking-wide text-white/40">{label}</p>
     </div>

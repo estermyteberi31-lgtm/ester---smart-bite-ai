@@ -72,7 +72,7 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex items-center gap-3">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
@@ -112,10 +112,13 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "60ms" }}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white/80">Neon color</h3>
-          <span className="text-xs text-white/40">🔥 {streak.currentStreak}-day streak</span>
+          <span className="text-xs text-white/40">
+            <span className={streak.currentStreak > 0 ? "flame-pulse" : ""}>🔥</span> {streak.currentStreak}-day
+            streak
+          </span>
         </div>
 
         <p className="mt-1 text-xs text-white/40">
@@ -161,7 +164,7 @@ export default function Settings() {
         {colorError && <p className="mt-2 text-xs text-red-400">{colorError}</p>}
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "120ms" }}>
         <h3 className="text-sm font-semibold text-white/80">Dietary preferences</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {DIET_OPTIONS.map((option) => {
@@ -171,7 +174,7 @@ export default function Settings() {
                 key={option}
                 type="button"
                 onClick={() => toggleDiet(option)}
-                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs font-medium transition-all active:scale-95"
                 style={
                   active
                     ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }
@@ -185,7 +188,7 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "180ms" }}>
         <h3 className="text-sm font-semibold text-white/80">Goals</h3>
         <div className="mt-3 flex flex-col gap-3">
           <Field label="Daily calorie goal">
@@ -224,7 +227,7 @@ export default function Settings() {
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="rounded-xl py-3 text-sm font-semibold shadow-lg disabled:opacity-50"
+        className="glow-accent rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
         style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
       >
         {saving ? "Saving..." : "Save settings"}

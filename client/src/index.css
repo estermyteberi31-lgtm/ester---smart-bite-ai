@@ -41,4 +41,72 @@ body {
   .input:focus {
     border-color: var(--accent);
   }
+
+  /* Cards fade + slide in on mount, staggered via inline --delay. */
+  .card-enter {
+    animation: card-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  /* Soft colored glow behind primary accent-filled buttons. */
+  .glow-accent {
+    box-shadow: 0 10px 28px -10px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  /* Shimmering placeholder for content that's still loading. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  .flame-pulse {
+    display: inline-block;
+    animation: flame-pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes flame-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(251, 146, 60, 0));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.6));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-enter,
+  .skeleton::after,
+  .flame-pulse {
+    animation: none !important;
+  }
 }
