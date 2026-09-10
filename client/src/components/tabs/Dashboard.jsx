@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import { scanImage } from "../../lib/api.js";
 import AnimatedNumber from "../AnimatedNumber.jsx";
+import MealPlan from "../MealPlan.jsx";
 
 export default function Dashboard() {
   const { gymMode, setGymMode, refreshProgressSeries } = useAppContext();
@@ -135,6 +136,8 @@ export default function Dashboard() {
 
       {loading && !result && <ScanSkeleton />}
       {result && <ScanResults result={result} />}
+
+      <MealPlan />
     </div>
   );
 }

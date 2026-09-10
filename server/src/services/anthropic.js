@@ -152,3 +152,60 @@ Generate today's workout as the JSON object described in your instructions.`;
   const text = response.content.find((block) => block.type === "text")?.text ?? "";
   return extractJson(text);
 }
+
+/**
+ * Builds a 7-day meal plan that fits both the user's calorie goal and their
+ * weekly grocery budget, using UK Tesco/Aldi pricing like the scan engine.
+ */
+export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences }) {
+  const anthropic = getClient();
+  if (!anthropic) {
+    throw new Error("ANTHROPIC_API_KEY is not configured on the server");
+  }
+
+  const systemPrompt = `You are the SmartBite AI meal planning engine. Return ONLY a single JSON object
+(no prose, no markdown fences) matching exactly this shape:
+
+{
+  "days": [
+    {
+      "day": string,              // e.g. "Monday"
+      "meals": [
+        { "type": "Breakfast" | "Lunch" | "Dinner", "name": string, "calories": number, "estimated_cost": number, "store": "Tesco" | "Aldi" }
+      ]
+    }
+  ],
+  "total_estimated_cost": number,   // sum of all 21 meals' estimated_cost across the week, in GBP
+  "average_daily_calories": number,
+  "insight": string,                // one short sentence on how well this plan fits the goal + budget
+  "currency": "GBP"
+}
+
+"days" must contain exactly 7 entries (Monday through Sunday), each with exactly 3 meals
+(Breakfast, Lunch, Dinner). Use realistic UK supermarket pricing in GBP for Tesco and Aldi, picking
+whichever store is cheaper for each meal's ingredients. Every day's total calories should land close
+to the user's daily calorie goal, and total_estimated_cost should stay at or under their weekly budget
+whenever realistically possible — if it truly can't be done, get as close as possible and say so plainly
+in "insight". Respect every listed dietary preference strictly (never suggest a non-vegetarian meal for
+a vegetarian, etc). Vary meals across the week rather than repeating the same dishes.`;
+
+  const userPrompt = `Daily calorie goal: ${calorieGoal} kcal
+Weekly grocery budget: £${weeklyBudget}
+Dietary preferences: ${
+    Array.isArray(dietaryPreferences) && dietaryPreferences.length > 0
+      ? dietaryPreferences.join(", ")
+      : "None specified"
+  }
+
+Generate this week's meal plan as the JSON object described in your instructions.`;
+
+  const mealPlanResponse = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 4000,
+    system: systemPrompt,
+    messages: [{ role: "user", content: userPrompt }],
+  });
+
+  const mealPlanText = mealPlanResponse.content.find((block) => block.type === "text")?.text ?? "";
+  return extractJson(mealPlanText);
+}

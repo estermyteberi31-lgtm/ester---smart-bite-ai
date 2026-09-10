@@ -84,6 +84,20 @@ export async function updateSettings(payload) {
   return handleResponse(res);
 }
 
+export async function fetchMealPlan() {
+  const res = await fetch(`${BASE_URL}/meal-plan`);
+  return handleResponse(res);
+}
+
+export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences }) {
+  const res = await fetch(`${BASE_URL}/meal-plan`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ calorieGoal, weeklyBudget, dietaryPreferences }),
+  });
+  return handleResponse(res);
+}
+
 export async function fetchHealth() {
   const res = await fetch(`${BASE_URL}/health`);
   return handleResponse(res);
