@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import { generateWorkout, completeWorkout } from "../../lib/api.js";
 import { celebrate } from "../../lib/confetti.js";
+import WorkoutTimer from "../WorkoutTimer.jsx";
+import WorkoutMusic from "../WorkoutMusic.jsx";
 
 const STYLES = ["Weight Lifting", "Cardio / Running", "Full Body Toning"];
 
@@ -59,7 +61,10 @@ export default function Workouts() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <WorkoutTimer />
+      <WorkoutMusic />
+
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
         <h2 className="text-base font-semibold">Today's workout</h2>
 
         <div className="mt-3 flex items-center justify-between rounded-xl bg-black/20 p-1">
