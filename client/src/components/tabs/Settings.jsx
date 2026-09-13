@@ -47,6 +47,7 @@ export default function Settings() {
         calorie_goal: Number(form.calorie_goal),
         weekly_budget: Number(form.weekly_budget),
         preferred_gym_mode: form.preferred_gym_mode,
+        custom_notes: form.custom_notes,
       });
       setSavedAt(Date.now());
     } catch (err) {
@@ -186,6 +187,23 @@ export default function Settings() {
             );
           })}
         </div>
+      </section>
+
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "150ms" }}>
+        <h3 className="text-sm font-semibold text-white/80">Tell the AI about you</h3>
+        <p className="mt-1 text-xs text-white/40">
+          Anything the chat and meal planner should know — age, training schedule, foods you hate,
+          intolerances not covered above, anything.
+        </p>
+        <textarea
+          value={form.custom_notes ?? ""}
+          onChange={(event) => setForm((prev) => ({ ...prev, custom_notes: event.target.value }))}
+          rows={4}
+          maxLength={2000}
+          placeholder={"e.g. I'm 19, trying to lose weight, I hate fish, I train 4x a week, I'm lactose intolerant..."}
+          className="input mt-3 resize-none"
+        />
+        <p className="mt-1 text-right text-[10px] text-white/30">{(form.custom_notes ?? "").length}/2000</p>
       </section>
 
       <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "180ms" }}>

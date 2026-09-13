@@ -26,6 +26,7 @@ db.exec(`
     weekly_budget REAL NOT NULL DEFAULT 60,
     preferred_gym_mode TEXT NOT NULL DEFAULT 'home',
     accent_color TEXT NOT NULL DEFAULT 'purple',
+    custom_notes TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -97,6 +98,7 @@ function ensureColumn(table, column, definition) {
 }
 
 ensureColumn("accounts", "accent_color", "TEXT NOT NULL DEFAULT 'purple'");
+ensureColumn("accounts", "custom_notes", "TEXT NOT NULL DEFAULT ''");
 
 function ensureDefaultAccount() {
   const existing = db.prepare("SELECT id FROM accounts ORDER BY id ASC LIMIT 1").get();

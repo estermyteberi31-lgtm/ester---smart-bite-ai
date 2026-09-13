@@ -21,6 +21,7 @@ const DEFAULT_SETTINGS = {
   weekly_budget: 60,
   preferred_gym_mode: "home",
   accent_color: "purple",
+  custom_notes: "",
 };
 
 const DEFAULT_STREAK = { currentStreak: 0, unlockAt: 7, colorsUnlocked: false };

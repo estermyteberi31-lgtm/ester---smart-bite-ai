@@ -15,6 +15,7 @@ function buildUserProfile(account) {
     dietaryPreferences.length > 0 ? `Dietary preferences: ${dietaryPreferences.join(", ")}` : null,
     account.calorie_goal ? `Daily calorie goal: ${account.calorie_goal} kcal` : null,
     account.weekly_budget ? `Weekly grocery budget: £${account.weekly_budget}` : null,
+    account.custom_notes && account.custom_notes.trim() ? `In their own words: "${account.custom_notes.trim()}"` : null,
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(". ") : null;
 }

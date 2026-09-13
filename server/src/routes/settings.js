@@ -52,13 +52,15 @@ router.put("/", (req, res) => {
     weekly_budget: Number.isFinite(req.body.weekly_budget) ? req.body.weekly_budget : current.weekly_budget,
     preferred_gym_mode: req.body.preferred_gym_mode ?? current.preferred_gym_mode,
     accent_color: accentColor,
+    custom_notes:
+      typeof req.body.custom_notes === "string" ? req.body.custom_notes.trim().slice(0, 2000) : current.custom_notes,
   };
 
   db.prepare(
     `UPDATE accounts SET name = @name, email = @email, plan = @plan,
        dietary_preferences = @dietary_preferences, calorie_goal = @calorie_goal,
        weekly_budget = @weekly_budget, preferred_gym_mode = @preferred_gym_mode,
-       accent_color = @accent_color
+       accent_color = @accent_color, custom_notes = @custom_notes
      WHERE id = @id`
   ).run({ ...next, id: DEFAULT_ACCOUNT_ID });
 
