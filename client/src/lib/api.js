@@ -112,6 +112,14 @@ export async function sendChatMessage(message) {
   return handleResponse(res);
 }
 
+export async function sendChatImage(file, caption) {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("caption", caption ?? "");
+  const res = await fetch(`${BASE_URL}/chat/image`, { method: "POST", body: formData });
+  return handleResponse(res);
+}
+
 export async function fetchHealth() {
   const res = await fetch(`${BASE_URL}/health`);
   return handleResponse(res);

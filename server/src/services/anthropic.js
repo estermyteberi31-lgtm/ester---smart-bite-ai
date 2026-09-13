@@ -240,3 +240,42 @@ export async function chatWithNutritionAssistant({ messages, userProfile }) {
 
   return response.content.find((block) => block.type === "text")?.text ?? "";
 }
+
+/**
+ * Vision-capable reply from the same nutrition-only chat assistant: the user
+ * sends a food photo (optionally with a caption) and gets a conversational
+ * answer, personalised the same way as the text-only chat. `history` is the
+ * prior plain-text turns; the new image turn is appended after it.
+ */
+export async function chatWithNutritionAssistantAboutImage({
+  base64Image,
+  mediaType,
+  caption,
+  history,
+  userProfile,
+}) {
+  const anthropic = getClient();
+  if (!anthropic) {
+    throw new Error("ANTHROPIC_API_KEY is not configured on the server");
+  }
+
+  const imageMessage = {
+    role: "user",
+    content: [
+      { type: "image", source: { type: "base64", media_type: mediaType, data: base64Image } },
+      {
+        type: "text",
+        text: caption && caption.trim().length > 0 ? caption.trim() : "What is this food, and what are the rough calories and macros?",
+      },
+    ],
+  };
+
+  const response = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 700,
+    system: buildNutritionSystemPrompt(userProfile),
+    messages: [...(history ?? []).map((message) => ({ role: message.role, content: message.content })), imageMessage],
+  });
+
+  return response.content.find((block) => block.type === "text")?.text ?? "";
+}

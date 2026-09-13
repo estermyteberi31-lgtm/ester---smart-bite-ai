@@ -1,8 +1,25 @@
 import { Router } from "express";
+import multer from "multer";
 import { db, DEFAULT_ACCOUNT_ID } from "../db/index.js";
-import { chatWithNutritionAssistant, isAnthropicConfigured } from "../services/anthropic.js";
+import {
+  chatWithNutritionAssistant,
+  chatWithNutritionAssistantAboutImage,
+  isAnthropicConfigured,
+} from "../services/anthropic.js";
 
 const router = Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      cb(new Error("Only image uploads are supported"));
+      return;
+    }
+    cb(null, true);
+  },
+});
 
 const insertMessage = db.prepare(
   `INSERT INTO chat_messages (account_id, role, content) VALUES (?, ?, ?)`
@@ -61,6 +78,45 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.error("[/api/chat] error:", error.message);
     res.status(500).json({ error: "Failed to get a response", detail: error.message });
+  }
+});
+
+router.post("/image", upload.single("image"), async (req, res) => {
+  try {
+    if (!isAnthropicConfigured()) {
+      return res.status(503).json({ error: "AI chat is not configured. Set ANTHROPIC_API_KEY on the server." });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: "An image file is required under the 'image' field." });
+    }
+
+    const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
+    const account = db.prepare("SELECT * FROM accounts WHERE id = ?").get(DEFAULT_ACCOUNT_ID);
+    const userProfile = buildUserProfile(account);
+
+    const historyRows = db
+      .prepare(`SELECT role, content FROM chat_messages WHERE account_id = ? ORDER BY id ASC LIMIT 40`)
+      .all(DEFAULT_ACCOUNT_ID);
+
+    const reply = await chatWithNutritionAssistantAboutImage({
+      base64Image: req.file.buffer.toString("base64"),
+      mediaType: req.file.mimetype,
+      caption,
+      history: historyRows,
+      userProfile,
+    });
+
+    const userContentLabel = caption ? `[Photo] ${caption}` : "[Photo]";
+
+    db.transaction(() => {
+      insertMessage.run(DEFAULT_ACCOUNT_ID, "user", userContentLabel);
+      insertMessage.run(DEFAULT_ACCOUNT_ID, "assistant", reply);
+    })();
+
+    res.json({ reply });
+  } catch (error) {
+    console.error("[/api/chat/image] error:", error.message);
+    res.status(500).json({ error: "Failed to analyze the photo", detail: error.message });
   }
 });
 
