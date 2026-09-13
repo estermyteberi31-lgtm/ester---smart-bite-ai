@@ -1,202 +1,134 @@
-import { useState } from "react";
-import { useAppContext } from "../../context/AppContext.jsx";
-import { generateWorkout, completeWorkout } from "../../lib/api.js";
-import { celebrate } from "../../lib/confetti.js";
-import WorkoutTimer from "../WorkoutTimer.jsx";
-import WorkoutMusic from "../WorkoutMusic.jsx";
-
-const STYLES = ["Weight Lifting", "Cardio / Running", "Full Body Toning"];
+import { useEffect, useRef, useState } from "react";
+import { fetchChatHistory, sendChatMessage } from "../../lib/api.js";
 
 export default function Workouts() {
-  const { gymMode, setGymMode, settings, workoutHistory, refreshWorkoutHistory, refreshProgressSeries } =
-    useAppContext();
-  const [style, setStyle] = useState(STYLES[0]);
-  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
-  const [workout, setWorkout] = useState(null);
-  const [completing, setCompleting] = useState(false);
-  const [completed, setCompleted] = useState(false);
+  const scrollRef = useRef(null);
 
-  async function handleGenerate() {
-    setLoading(true);
+  useEffect(() => {
+    fetchChatHistory()
+      .then((data) => setMessages(data.messages ?? []))
+      .catch(() => {})
+      .finally(() => setLoadingHistory(false));
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, sending]);
+
+  async function handleSend() {
+    const trimmed = input.trim();
+    if (!trimmed || sending) return;
     setError(null);
-    setCompleted(false);
+    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+    setInput("");
+    setSending(true);
     try {
-      const data = await generateWorkout({
-        mode: gymMode,
-        style,
-        profile: {
-          calorieGoal: settings.calorie_goal,
-          dietaryPreferences: settings.dietary_preferences,
-        },
-      });
-      setWorkout(data);
+      const { reply } = await sendChatMessage(trimmed);
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
-      setError(err.message || "Failed to generate a workout.");
+      setError(err.message || "Failed to get a response.");
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   }
 
-  async function handleComplete() {
-    if (!workout) return;
-    setCompleting(true);
-    try {
-      await completeWorkout({
-        title: workout.title,
-        focus: workout.focus_phrase,
-        mode: workout.mode ?? gymMode,
-        style: workout.style ?? style,
-      });
-      setCompleted(true);
-      celebrate();
-      refreshWorkoutHistory();
-      refreshProgressSeries();
-    } catch (err) {
-      setError(err.message || "Failed to log workout.");
-    } finally {
-      setCompleting(false);
+  function handleKeyDown(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
     }
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <WorkoutTimer />
-      <WorkoutMusic />
-
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
-        <h2 className="text-base font-semibold">Today's workout</h2>
-
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-black/20 p-1">
-          <ToggleOption
-            label="Home Mode"
-            sub="No Equipment"
-            active={gymMode === "home"}
-            onClick={() => setGymMode("home")}
-          />
-          <ToggleOption
-            label="Gym Mode"
-            sub="Full Equipment"
-            active={gymMode === "gym"}
-            onClick={() => setGymMode("gym")}
-          />
-        </div>
-
-        <label className="mt-4 block text-xs font-medium text-white/50" htmlFor="workout-style">
-          Target workout style
-        </label>
-        <select id="workout-style" value={style} onChange={(event) => setStyle(event.target.value)} className="input mt-1.5">
-          {STYLES.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={loading}
-          className="glow-accent mt-4 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
-          style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
-        >
-          {loading ? (
-            <span className="inline-flex items-center gap-2">
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              Generating...
-            </span>
-          ) : (
-            "Generate Workout Today"
-          )}
-        </button>
-
-        {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+    <div className="flex flex-col gap-3">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <h2 className="text-base font-semibold">Nutrition chat</h2>
+        <p className="text-xs text-white/40">Ask about food, meals, calories, or your goals.</p>
       </section>
 
-      {loading && !workout && <WorkoutSkeleton />}
-
-      {workout && (
-        <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <h3 className="text-base font-semibold" style={{ color: "var(--accent)" }}>
-            {workout.title}
-          </h3>
-          <p className="mt-1 text-xs text-white/50">{workout.focus_phrase}</p>
-
-          <div className="mt-2 flex gap-3 text-[11px] text-white/40">
-            {workout.estimated_duration_minutes ? <span>~{workout.estimated_duration_minutes} min</span> : null}
-            {workout.estimated_calories_burned ? <span>~{workout.estimated_calories_burned} kcal burned</span> : null}
+      <div
+        ref={scrollRef}
+        className="card-enter h-[55vh] overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+        style={{ "--delay": "40ms" }}
+      >
+        {loadingHistory ? (
+          <div className="flex flex-col gap-2">
+            <div className="skeleton h-10 w-2/3 rounded-2xl" />
+            <div className="skeleton ml-auto h-10 w-1/2 rounded-2xl" />
           </div>
-
-          <ol className="mt-4 flex flex-col gap-2.5">
-            {(workout.steps ?? []).map((step, idx) => (
-              <li key={idx} className="rounded-xl bg-black/20 p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    {idx + 1}. {step.name}
-                  </span>
-                  <span className="text-xs text-white/50">
-                    {step.sets} × {step.reps}
-                  </span>
-                </div>
-                {step.form_tip && <p className="mt-1 text-[11px] text-white/40">{step.form_tip}</p>}
-              </li>
+        ) : messages.length === 0 ? (
+          <p className="mt-6 text-center text-xs text-white/30">
+            Say hi! Try "What should I eat before a run?" or "Is this snack good for my goal?"
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {messages.map((msg, idx) => (
+              <ChatBubble key={idx} role={msg.role} content={msg.content} />
             ))}
-          </ol>
+            {sending && <TypingBubble />}
+          </div>
+        )}
+      </div>
 
-          <button
-            type="button"
-            onClick={handleComplete}
-            disabled={completing || completed}
-            className={`mt-4 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
-              completed ? "bg-green-600/30 text-green-300" : "bg-green-600 text-white"
-            } disabled:opacity-70`}
-          >
-            {completed ? "Workout logged ✓" : completing ? "Logging..." : "Mark Workout Complete"}
-          </button>
-        </section>
-      )}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
-      {workoutHistory.length > 0 && (
-        <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
-          <h3 className="text-sm font-semibold text-white/80">Recent workouts</h3>
-          <ul className="mt-2 flex flex-col gap-1.5 text-xs text-white/50">
-            {workoutHistory.slice(0, 5).map((entry) => (
-              <li key={entry.id} className="flex items-center justify-between">
-                <span className="text-white/70">{entry.title}</span>
-                <span>{new Date(entry.completed_at).toLocaleDateString()}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <div className="flex items-end gap-2">
+        <textarea
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          placeholder="Ask about food, meals, or calories..."
+          className="input max-h-24 flex-1 resize-none"
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={sending || !input.trim()}
+          className="glow-accent shrink-0 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
+          style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
 }
 
-function WorkoutSkeleton() {
+function ChatBubble({ role, content }) {
+  const isUser = role === "user";
   return (
-    <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-      <div className="skeleton h-5 w-40 rounded" />
-      <div className="skeleton mt-2 h-3 w-56 rounded" />
-      <div className="mt-4 flex flex-col gap-2.5">
-        {Array.from({ length: 4 }).map((_, idx) => (
-          <div key={idx} className="skeleton h-12 rounded-xl" />
-        ))}
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+      <div
+        className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm ${
+          isUser ? "" : "bg-black/20 text-white/90"
+        }`}
+        style={isUser ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" } : undefined}
+      >
+        {content}
       </div>
-    </section>
+    </div>
   );
 }
 
-function ToggleOption({ label, sub, active, onClick }) {
+function TypingBubble() {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex flex-1 flex-col items-center rounded-lg py-2.5 transition-all active:scale-95"
-      style={active ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" } : { color: "rgba(255,255,255,0.5)" }}
-    >
-      <span className="text-xs font-semibold">{label}</span>
-      <span className="text-[10px] opacity-70">{sub}</span>
-    </button>
+    <div className="flex justify-start">
+      <div className="flex items-center gap-1 rounded-2xl bg-black/20 px-4 py-3">
+        {[0, 1, 2].map((idx) => (
+          <span
+            key={idx}
+            className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/50"
+            style={{ animationDelay: `${idx * 0.15}s` }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

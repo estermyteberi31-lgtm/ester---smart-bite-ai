@@ -32,17 +32,18 @@ const TABS = [
   },
   {
     id: "workouts",
-    label: "Workouts",
+    label: "Chat",
     icon: (active) => (
       <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
         <path
-          d="M4 9v6M2 10.5v3M22 10.5v3M20 9v6M7 12h10"
+          d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4.4 3.3A.5.5 0 0 1 4 20V17H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"
           stroke={active ? "var(--accent)" : "currentColor"}
           strokeWidth="1.8"
-          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <rect x="5" y="8" width="2.5" height="8" rx="0.8" fill={active ? "var(--accent)" : "currentColor"} />
-        <rect x="16.5" y="8" width="2.5" height="8" rx="0.8" fill={active ? "var(--accent)" : "currentColor"} />
+        <circle cx="8" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
+        <circle cx="12" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
+        <circle cx="16" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
       </svg>
     ),
   },

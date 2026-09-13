@@ -15,7 +15,7 @@ const TAB_COMPONENTS = {
 
 const TAB_TITLES = {
   dashboard: "Dashboard",
-  workouts: "Workouts",
+  workouts: "Chat",
   progress: "Progress",
   settings: "Settings",
 };

@@ -98,6 +98,20 @@ export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPrefe
   return handleResponse(res);
 }
 
+export async function fetchChatHistory() {
+  const res = await fetch(`${BASE_URL}/chat/history`);
+  return handleResponse(res);
+}
+
+export async function sendChatMessage(message) {
+  const res = await fetch(`${BASE_URL}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
+  return handleResponse(res);
+}
+
 export async function fetchHealth() {
   const res = await fetch(`${BASE_URL}/health`);
   return handleResponse(res);

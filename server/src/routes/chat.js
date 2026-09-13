@@ -1,0 +1,66 @@
+import { Router } from "express";
+import { db, DEFAULT_ACCOUNT_ID } from "../db/index.js";
+import { chatWithNutritionAssistant, isAnthropicConfigured } from "../services/anthropic.js";
+
+const router = Router();
+
+const insertMessage = db.prepare(
+  `INSERT INTO chat_messages (account_id, role, content) VALUES (?, ?, ?)`
+);
+
+function buildUserProfile(account) {
+  const dietaryPreferences = JSON.parse(account.dietary_preferences || "[]");
+  const parts = [
+    account.name ? `Name: ${account.name}` : null,
+    dietaryPreferences.length > 0 ? `Dietary preferences: ${dietaryPreferences.join(", ")}` : null,
+    account.calorie_goal ? `Daily calorie goal: ${account.calorie_goal} kcal` : null,
+    account.weekly_budget ? `Weekly grocery budget: £${account.weekly_budget}` : null,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(". ") : null;
+}
+
+router.get("/history", (req, res) => {
+  const rows = db
+    .prepare(
+      `SELECT role, content, created_at FROM chat_messages WHERE account_id = ? ORDER BY id ASC LIMIT 100`
+    )
+    .all(DEFAULT_ACCOUNT_ID);
+  res.json({ messages: rows });
+});
+
+router.post("/", async (req, res) => {
+  try {
+    if (!isAnthropicConfigured()) {
+      return res.status(503).json({ error: "AI chat is not configured. Set ANTHROPIC_API_KEY on the server." });
+    }
+
+    const userMessage = typeof req.body.message === "string" ? req.body.message.trim() : "";
+    if (!userMessage) {
+      return res.status(400).json({ error: "message is required" });
+    }
+
+    const account = db.prepare("SELECT * FROM accounts WHERE id = ?").get(DEFAULT_ACCOUNT_ID);
+    const userProfile = buildUserProfile(account);
+
+    const historyRows = db
+      .prepare(`SELECT role, content FROM chat_messages WHERE account_id = ? ORDER BY id ASC LIMIT 40`)
+      .all(DEFAULT_ACCOUNT_ID);
+
+    const reply = await chatWithNutritionAssistant({
+      messages: [...historyRows, { role: "user", content: userMessage }],
+      userProfile,
+    });
+
+    db.transaction(() => {
+      insertMessage.run(DEFAULT_ACCOUNT_ID, "user", userMessage);
+      insertMessage.run(DEFAULT_ACCOUNT_ID, "assistant", reply);
+    })();
+
+    res.json({ reply });
+  } catch (error) {
+    console.error("[/api/chat] error:", error.message);
+    res.status(500).json({ error: "Failed to get a response", detail: error.message });
+  }
+});
+
+export default router;

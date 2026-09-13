@@ -12,6 +12,7 @@ import workoutRouter from "./routes/workout.js";
 import progressRouter from "./routes/progress.js";
 import settingsRouter from "./routes/settings.js";
 import mealPlanRouter from "./routes/mealplan.js";
+import chatRouter from "./routes/chat.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/workout", workoutRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/meal-plan", mealPlanRouter);
+app.use("/api/chat", chatRouter);
 
 // Serve the built React client in production.
 const clientDist = path.join(__dirname, "..", "..", "client", "dist");

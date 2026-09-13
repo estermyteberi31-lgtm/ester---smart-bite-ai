@@ -209,3 +209,34 @@ Generate this week's meal plan as the JSON object described in your instructions
   const mealPlanText = mealPlanResponse.content.find((block) => block.type === "text")?.text ?? "";
   return extractJson(mealPlanText);
 }
+
+const buildNutritionSystemPrompt = (userProfile) => `You are a nutrition assistant inside SmartBite AI.
+You only discuss food, diet, nutrition, meal planning, and calories.
+If asked about anything unrelated to food or nutrition, politely say
+you only know about nutrition and redirect the conversation.
+
+Here is what the user has told you about themselves:
+${userProfile || "The user hasn't added any personal info yet."}
+
+Use this to personalise every response. Be conversational but accurate.`;
+
+/**
+ * Plain-text conversational reply from the nutrition-only chat assistant.
+ * `messages` is the full running conversation, oldest first, each
+ * { role: "user" | "assistant", content: string }.
+ */
+export async function chatWithNutritionAssistant({ messages, userProfile }) {
+  const anthropic = getClient();
+  if (!anthropic) {
+    throw new Error("ANTHROPIC_API_KEY is not configured on the server");
+  }
+
+  const response = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 700,
+    system: buildNutritionSystemPrompt(userProfile),
+    messages: messages.map((message) => ({ role: message.role, content: message.content })),
+  });
+
+  return response.content.find((block) => block.type === "text")?.text ?? "";
+}
