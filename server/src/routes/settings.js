@@ -12,6 +12,7 @@ function serializeAccount(row) {
   return {
     ...row,
     dietary_preferences: JSON.parse(row.dietary_preferences || "[]"),
+    onboarding_completed: Boolean(row.onboarding_completed),
   };
 }
 
@@ -54,13 +55,18 @@ router.put("/", (req, res) => {
     accent_color: accentColor,
     custom_notes:
       typeof req.body.custom_notes === "string" ? req.body.custom_notes.trim().slice(0, 2000) : current.custom_notes,
+    onboarding_completed:
+      typeof req.body.onboarding_completed === "boolean"
+        ? (req.body.onboarding_completed ? 1 : 0)
+        : current.onboarding_completed,
   };
 
   db.prepare(
     `UPDATE accounts SET name = @name, email = @email, plan = @plan,
        dietary_preferences = @dietary_preferences, calorie_goal = @calorie_goal,
        weekly_budget = @weekly_budget, preferred_gym_mode = @preferred_gym_mode,
-       accent_color = @accent_color, custom_notes = @custom_notes
+       accent_color = @accent_color, custom_notes = @custom_notes,
+       onboarding_completed = @onboarding_completed
      WHERE id = @id`
   ).run({ ...next, id: DEFAULT_ACCOUNT_ID });
 

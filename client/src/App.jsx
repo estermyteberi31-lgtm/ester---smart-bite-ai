@@ -5,6 +5,7 @@ import Dashboard from "./components/tabs/Dashboard.jsx";
 import Workouts from "./components/tabs/Workouts.jsx";
 import Progress from "./components/tabs/Progress.jsx";
 import Settings from "./components/tabs/Settings.jsx";
+import OnboardingQuiz from "./screens/OnboardingQuiz.jsx";
 
 const TAB_COMPONENTS = {
   dashboard: Dashboard,
@@ -21,8 +22,12 @@ const TAB_TITLES = {
 };
 
 export default function App() {
-  const { activeTab } = useAppContext();
+  const { activeTab, settings, settingsLoaded } = useAppContext();
   const ActiveTabComponent = TAB_COMPONENTS[activeTab] ?? Dashboard;
+
+  if (settingsLoaded && !settings.onboarding_completed) {
+    return <OnboardingQuiz />;
+  }
 
   return (
     <div className="min-h-screen bg-[#0f0b1a] text-white">

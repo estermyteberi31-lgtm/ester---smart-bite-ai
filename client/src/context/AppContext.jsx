@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS = {
   preferred_gym_mode: "home",
   accent_color: "purple",
   custom_notes: "",
+  onboarding_completed: false,
 };
 
 const DEFAULT_STREAK = { currentStreak: 0, unlockAt: 7, colorsUnlocked: false };
