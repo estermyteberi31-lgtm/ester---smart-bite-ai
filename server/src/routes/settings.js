@@ -59,6 +59,10 @@ router.put("/", (req, res) => {
       typeof req.body.onboarding_completed === "boolean"
         ? (req.body.onboarding_completed ? 1 : 0)
         : current.onboarding_completed,
+    goal: typeof req.body.goal === "string" ? req.body.goal.trim().slice(0, 100) : current.goal,
+    eating_habits:
+      typeof req.body.eating_habits === "string" ? req.body.eating_habits.trim().slice(0, 100) : current.eating_habits,
+    obstacles: typeof req.body.obstacles === "string" ? req.body.obstacles.trim().slice(0, 100) : current.obstacles,
   };
 
   db.prepare(
@@ -66,7 +70,8 @@ router.put("/", (req, res) => {
        dietary_preferences = @dietary_preferences, calorie_goal = @calorie_goal,
        weekly_budget = @weekly_budget, preferred_gym_mode = @preferred_gym_mode,
        accent_color = @accent_color, custom_notes = @custom_notes,
-       onboarding_completed = @onboarding_completed
+       onboarding_completed = @onboarding_completed,
+       goal = @goal, eating_habits = @eating_habits, obstacles = @obstacles
      WHERE id = @id`
   ).run({ ...next, id: DEFAULT_ACCOUNT_ID });
 

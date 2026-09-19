@@ -100,6 +100,9 @@ function ensureColumn(table, column, definition) {
 ensureColumn("accounts", "accent_color", "TEXT NOT NULL DEFAULT 'purple'");
 ensureColumn("accounts", "custom_notes", "TEXT NOT NULL DEFAULT ''");
 ensureColumn("accounts", "onboarding_completed", "INTEGER NOT NULL DEFAULT 0");
+ensureColumn("accounts", "goal", "TEXT NOT NULL DEFAULT ''");
+ensureColumn("accounts", "eating_habits", "TEXT NOT NULL DEFAULT ''");
+ensureColumn("accounts", "obstacles", "TEXT NOT NULL DEFAULT ''");
 
 function ensureDefaultAccount() {
   const existing = db.prepare("SELECT id FROM accounts ORDER BY id ASC LIMIT 1").get();

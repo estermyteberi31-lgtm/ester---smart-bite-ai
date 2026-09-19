@@ -13,13 +13,25 @@ const DIET_OPTIONS = [
   "Kosher",
 ];
 
-const QUESTION_STEPS = ["name", "diet", "calories", "budget", "notes"];
+const GOAL_OPTIONS = ["Lose weight", "Build muscle", "Eat healthier", "Maintain weight"];
+const HABITS_OPTIONS = [
+  "I skip meals often",
+  "I eat well early then fall off",
+  "I stress eat",
+  "I'm pretty consistent",
+];
+const OBSTACLES_OPTIONS = ["No time to cook", "I don't know what to eat", "I lose motivation", "Cravings"];
+
+const QUESTION_STEPS = ["goal", "habits", "obstacles", "name", "diet", "calories", "budget", "notes"];
 const STEPS = ["welcome", ...QUESTION_STEPS, "done"];
 
 export default function OnboardingQuiz() {
   const { settings, saveSettings } = useAppContext();
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState({
+    goal: settings.goal || "",
+    eating_habits: settings.eating_habits || "",
+    obstacles: settings.obstacles || "",
     name: settings.name || "",
     dietary_preferences: settings.dietary_preferences || [],
     calorie_goal: settings.calorie_goal || 2200,
@@ -33,6 +45,14 @@ export default function OnboardingQuiz() {
   const isFirst = stepIndex === 0;
   const isLast = step === "done";
   const questionIndex = QUESTION_STEPS.indexOf(step);
+  const isSingleSelectStep = step === "goal" || step === "habits" || step === "obstacles";
+
+  function selectSingle(field) {
+    return (value) => {
+      setForm((prev) => ({ ...prev, [field]: value }));
+      setTimeout(() => setStepIndex((idx) => idx + 1), 250);
+    };
+  }
 
   function toggleDiet(option) {
     setForm((prev) => {
@@ -51,6 +71,9 @@ export default function OnboardingQuiz() {
     setError(null);
     try {
       await saveSettings({
+        goal: form.goal,
+        eating_habits: form.eating_habits,
+        obstacles: form.obstacles,
         name: form.name,
         dietary_preferences: form.dietary_preferences,
         calorie_goal: Number(form.calorie_goal),
@@ -117,6 +140,24 @@ export default function OnboardingQuiz() {
                 minute.
               </p>
             </div>
+          )}
+
+          {step === "goal" && (
+            <QuizStep title="What's your main goal?">
+              <OptionList options={GOAL_OPTIONS} selected={form.goal} onSelect={selectSingle("goal")} />
+            </QuizStep>
+          )}
+
+          {step === "habits" && (
+            <QuizStep title="How would you describe your eating habits?">
+              <OptionList options={HABITS_OPTIONS} selected={form.eating_habits} onSelect={selectSingle("eating_habits")} />
+            </QuizStep>
+          )}
+
+          {step === "obstacles" && (
+            <QuizStep title="Anything that gets in your way?">
+              <OptionList options={OBSTACLES_OPTIONS} selected={form.obstacles} onSelect={selectSingle("obstacles")} />
+            </QuizStep>
           )}
 
           {step === "name" && (
@@ -242,15 +283,17 @@ export default function OnboardingQuiz() {
                 Back
               </button>
             )}
-            <button
-              type="button"
-              onClick={goNext}
-              disabled={saving}
-              className="glow-accent flex-1 rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
-              style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
-            >
-              {saving ? "Saving..." : isLast ? "Get started" : step === "welcome" ? "Let's go" : "Next"}
-            </button>
+            {!isSingleSelectStep && (
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={saving}
+                className="glow-accent flex-1 rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+                style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+              >
+                {saving ? "Saving..." : isLast ? "Get started" : step === "welcome" ? "Let's go" : "Next"}
+              </button>
+            )}
           </div>
           {questionIndex !== -1 && (
             <button
@@ -264,6 +307,31 @@ export default function OnboardingQuiz() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function OptionList({ options, selected, onSelect }) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      {options.map((option) => {
+        const active = selected === option;
+        return (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onSelect(option)}
+            className="rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-all active:scale-[0.98]"
+            style={
+              active
+                ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)", borderColor: "var(--accent)" }
+                : { color: "rgba(255,255,255,0.8)", backgroundColor: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)" }
+            }
+          >
+            {option}
+          </button>
+        );
+      })}
     </div>
   );
 }

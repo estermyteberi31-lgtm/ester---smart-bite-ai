@@ -23,6 +23,9 @@ const DEFAULT_SETTINGS = {
   accent_color: "purple",
   custom_notes: "",
   onboarding_completed: false,
+  goal: "",
+  eating_habits: "",
+  obstacles: "",
 };
 
 const DEFAULT_STREAK = { currentStreak: 0, unlockAt: 7, colorsUnlocked: false };
