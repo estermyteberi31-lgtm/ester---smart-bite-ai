@@ -1,4 +1,8 @@
-const BASE_URL = "/api";
+// On the web, relative "/api" works because the browser page and the API
+// share the same address. A native app (Capacitor) has no address of its
+// own, so it needs the server's full address instead — set via
+// VITE_API_BASE_URL at build time (see client/.env.production.example).
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 async function handleResponse(res) {
   const isJson = res.headers.get("content-type")?.includes("application/json");
