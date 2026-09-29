@@ -93,11 +93,11 @@ export async function fetchMealPlan() {
   return handleResponse(res);
 }
 
-export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences }) {
+export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences, weeklyNotes }) {
   const res = await fetch(`${BASE_URL}/meal-plan`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ calorieGoal, weeklyBudget, dietaryPreferences }),
+    body: JSON.stringify({ calorieGoal, weeklyBudget, dietaryPreferences, weeklyNotes }),
   });
   return handleResponse(res);
 }

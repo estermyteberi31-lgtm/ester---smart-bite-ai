@@ -29,6 +29,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SmartBite AI uses your microphone so you can tell it about your week by voice instead of typing.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>SmartBite AI converts your voice to text on-device to build your meal plan.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

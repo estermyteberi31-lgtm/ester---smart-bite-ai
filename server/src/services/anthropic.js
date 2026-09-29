@@ -157,7 +157,7 @@ Generate today's workout as the JSON object described in your instructions.`;
  * Builds a 7-day meal plan that fits both the user's calorie goal and their
  * weekly grocery budget, using UK Tesco/Aldi pricing like the scan engine.
  */
-export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences }) {
+export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences, weeklyNotes }) {
   const anthropic = getClient();
   if (!anthropic) {
     throw new Error("ANTHROPIC_API_KEY is not configured on the server");
@@ -196,6 +196,7 @@ Dietary preferences: ${
       ? dietaryPreferences.join(", ")
       : "None specified"
   }
+${weeklyNotes && weeklyNotes.trim() ? `What the user said about this week: "${weeklyNotes.trim()}" — factor this in (e.g. travel, events, cravings, how much time they have to cook).` : ""}
 
 Generate this week's meal plan as the JSON object described in your instructions.`;
 

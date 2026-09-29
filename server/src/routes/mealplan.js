@@ -43,8 +43,10 @@ router.post("/", async (req, res) => {
     const dietaryPreferences = Array.isArray(req.body.dietaryPreferences)
       ? req.body.dietaryPreferences
       : JSON.parse(account.dietary_preferences || "[]");
+    const weeklyNotes =
+      typeof req.body.weeklyNotes === "string" ? req.body.weeklyNotes.trim().slice(0, 500) : "";
 
-    const plan = await generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences });
+    const plan = await generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences, weeklyNotes });
 
     const result = insertMealPlan.run({
       account_id: DEFAULT_ACCOUNT_ID,
