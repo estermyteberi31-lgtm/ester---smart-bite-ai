@@ -42,7 +42,7 @@ export default function Workouts() {
       const { reply } = await sendChatMessage(trimmed);
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
-      setError(err.message || "Failed to get a response.");
+      setError(err.detail || err.message || "Failed to get a response.");
     } finally {
       setSending(false);
     }
@@ -69,7 +69,7 @@ export default function Workouts() {
       const { reply } = await sendChatImage(file, caption);
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
-      setError(err.message || "Failed to analyze the photo.");
+      setError(err.detail || err.message || "Failed to analyze the photo.");
     } finally {
       setSending(false);
     }

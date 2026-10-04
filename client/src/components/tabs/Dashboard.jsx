@@ -35,7 +35,7 @@ export default function Dashboard() {
       setResult(data);
       refreshProgressSeries();
     } catch (err) {
-      setError(err.message || "Failed to analyze the photo.");
+      setError(err.detail || err.message || "Failed to analyze the photo.");
     } finally {
       setLoading(false);
     }

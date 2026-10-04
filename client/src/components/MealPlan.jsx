@@ -48,7 +48,7 @@ export default function MealPlan() {
       setPlan(data);
       setWeeklyNotes("");
     } catch (err) {
-      setError(err.message || "Failed to generate a meal plan.");
+      setError(err.detail || err.message || "Failed to generate a meal plan.");
     } finally {
       setLoading(false);
     }
