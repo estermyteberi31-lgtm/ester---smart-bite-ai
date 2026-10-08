@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { fetchChatHistory, sendChatMessage, sendChatImage } from "../../lib/api.js";
+import {
+  fetchConversations,
+  fetchConversationMessages,
+  deleteConversation,
+  sendChatMessage,
+  sendChatImage,
+} from "../../lib/api.js";
 
 const SpeechRecognitionApi =
   typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 
 export default function Workouts() {
+  const [view, setView] = useState("chat"); // "chat" | "history"
+  const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [conversations, setConversations] = useState([]);
+  const [loadingHistoryList, setLoadingHistoryList] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
@@ -14,13 +23,6 @@ export default function Workouts() {
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
-
-  useEffect(() => {
-    fetchChatHistory()
-      .then((data) => setMessages(data.messages ?? []))
-      .catch(() => {})
-      .finally(() => setLoadingHistory(false));
-  }, []);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -31,6 +33,49 @@ export default function Workouts() {
     return () => recognitionRef.current?.stop();
   }, []);
 
+  function startNewChat() {
+    setConversationId(null);
+    setMessages([]);
+    setError(null);
+    setView("chat");
+  }
+
+  async function openHistory() {
+    setView("history");
+    setLoadingHistoryList(true);
+    try {
+      const data = await fetchConversations();
+      setConversations(data.conversations ?? []);
+    } catch {
+      // ignore
+    } finally {
+      setLoadingHistoryList(false);
+    }
+  }
+
+  async function openConversation(id) {
+    setError(null);
+    try {
+      const data = await fetchConversationMessages(id);
+      setMessages(data.messages ?? []);
+      setConversationId(id);
+      setView("chat");
+    } catch (err) {
+      setError(err.detail || err.message || "Couldn't load that conversation.");
+    }
+  }
+
+  async function handleDeleteConversation(event, id) {
+    event.stopPropagation();
+    try {
+      await deleteConversation(id);
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      if (id === conversationId) startNewChat();
+    } catch {
+      // ignore
+    }
+  }
+
   async function handleSend() {
     const trimmed = input.trim();
     if (!trimmed || sending) return;
@@ -39,7 +84,8 @@ export default function Workouts() {
     setInput("");
     setSending(true);
     try {
-      const { reply } = await sendChatMessage(trimmed);
+      const { reply, conversationId: returnedId } = await sendChatMessage(trimmed, conversationId);
+      setConversationId(returnedId);
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
       setError(err.detail || err.message || "Failed to get a response.");
@@ -66,7 +112,8 @@ export default function Workouts() {
     setInput("");
     setSending(true);
     try {
-      const { reply } = await sendChatImage(file, caption);
+      const { reply, conversationId: returnedId } = await sendChatImage(file, caption, conversationId);
+      setConversationId(returnedId);
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
       setError(err.detail || err.message || "Failed to analyze the photo.");
@@ -98,11 +145,57 @@ export default function Workouts() {
     recognition.start();
   }
 
+  if (view === "history") {
+    return (
+      <HistoryPanel
+        conversations={conversations}
+        loading={loadingHistoryList}
+        onBack={() => setView("chat")}
+        onSelect={openConversation}
+        onDelete={handleDeleteConversation}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <h2 className="text-base font-semibold">Nutrition chat</h2>
-        <p className="text-xs text-white/40">Ask about food, meals, calories, or your goals. Snap a photo or use your voice too.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold">Nutrition chat</h2>
+            <p className="text-xs text-white/40">Ask about food, meals, calories, or your goals.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openHistory}
+              title="Chat history"
+              aria-label="Chat history"
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-white/60 transition-all active:scale-90"
+            >
+              <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+                <path
+                  d="M12 8v5l3 2M4 12a8 8 0 1 1 2.6 5.9M4 12v5m0-5h5"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={startNewChat}
+              title="New chat"
+              aria-label="New chat"
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-white/60 transition-all active:scale-90"
+            >
+              <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </section>
 
       <div
@@ -110,12 +203,7 @@ export default function Workouts() {
         className="card-enter h-[55vh] overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4"
         style={{ "--delay": "40ms" }}
       >
-        {loadingHistory ? (
-          <div className="flex flex-col gap-2">
-            <div className="skeleton h-10 w-2/3 rounded-2xl" />
-            <div className="skeleton ml-auto h-10 w-1/2 rounded-2xl" />
-          </div>
-        ) : messages.length === 0 ? (
+        {messages.length === 0 ? (
           <p className="mt-6 text-center text-xs text-white/30">
             Say hi! Try "What should I eat before a run?" or snap a photo of your meal.
           </p>
@@ -202,6 +290,96 @@ export default function Workouts() {
       </div>
     </div>
   );
+}
+
+function HistoryPanel({ conversations, loading, onBack, onSelect, onDelete }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Back to chat"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-white/60 transition-all active:scale-90"
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5">
+              <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <div>
+            <h2 className="text-base font-semibold">Chat history</h2>
+            <p className="text-xs text-white/40">Past conversations</p>
+          </div>
+        </div>
+      </section>
+
+      {loading ? (
+        <div className="flex flex-col gap-2">
+          <div className="skeleton h-16 rounded-2xl" />
+          <div className="skeleton h-16 rounded-2xl" />
+          <div className="skeleton h-16 rounded-2xl" />
+        </div>
+      ) : conversations.length === 0 ? (
+        <p className="mt-6 text-center text-xs text-white/30">No past conversations yet.</p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {conversations.map((conversation) => (
+            <div
+              key={conversation.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelect(conversation.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") onSelect(conversation.id);
+              }}
+              className="card-enter flex cursor-pointer items-start justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition-all active:scale-[0.99]"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white/90">{conversation.title}</p>
+                {conversation.preview && (
+                  <p className="mt-1 truncate text-xs text-white/40">{conversation.preview}</p>
+                )}
+                <p className="mt-1 text-[10px] uppercase tracking-wide text-white/30">
+                  {formatRelativeDate(conversation.updated_at)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={(event) => onDelete(event, conversation.id)}
+                aria-label="Delete conversation"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/30 transition-all hover:text-red-400 active:scale-90"
+              >
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                  <path
+                    d="M4 6h16M8 6V4h8v2m-9 0 1 14h8l1-14"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatRelativeDate(isoString) {
+  if (!isoString) return "";
+  const date = new Date(`${isoString.replace(" ", "T")}Z`);
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.round(diffMs / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.round(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.round(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 function ChatBubble({ role, content, imageUrl }) {

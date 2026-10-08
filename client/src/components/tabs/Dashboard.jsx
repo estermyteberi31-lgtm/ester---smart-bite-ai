@@ -208,12 +208,12 @@ function ScanResults({ result }) {
         <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white/80">Estimated cost</h3>
-            {typeof result.estimated_total_cost === "number" && (
+            {typeof result.estimated_total_low === "number" && typeof result.estimated_total_high === "number" && (
               <span
                 className="rounded-full px-2.5 py-1 text-xs font-semibold"
                 style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
               >
-                £{result.estimated_total_cost.toFixed(2)}
+                £{result.estimated_total_low.toFixed(2)}–£{result.estimated_total_high.toFixed(2)}
               </span>
             )}
           </div>
@@ -221,7 +221,9 @@ function ScanResults({ result }) {
             {prices.map((row, idx) => (
               <li key={idx} className="flex items-center justify-between rounded-xl bg-black/20 p-3 text-sm">
                 <span className="font-medium text-white/80">{row.item}</span>
-                <span className="text-white/50">£{Number(row.estimated_price ?? 0).toFixed(2)}</span>
+                <span className="text-white/50">
+                  £{Number(row.price_low ?? 0).toFixed(2)}–£{Number(row.price_high ?? 0).toFixed(2)}
+                </span>
               </li>
             ))}
           </ul>

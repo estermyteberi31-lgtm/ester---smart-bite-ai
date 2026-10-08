@@ -64,19 +64,21 @@ receipts and return ONLY a single JSON object (no prose, no markdown fences) mat
   "nutrition_score": number,       // 0-100 overall healthiness score for what was scanned
   "macro_split": { "protein_pct": number, "carbs_pct": number, "fat_pct": number },
   "estimated_prices": [
-    { "item": string, "estimated_price": number }
+    { "item": string, "price_low": number, "price_high": number }
   ],
-  "estimated_total_cost": number,
+  "estimated_total_low": number,
+  "estimated_total_high": number,
   "insight": string,               // one short actionable sentence
   "currency": "GBP"
 }
 
 Base every number on what is actually visible in the image. Use realistic UK grocery pricing in GBP when
-estimating estimated_prices — a single rough estimate per item, not a comparison between specific
-supermarkets (you don't have real-time pricing, so never claim one named store is cheaper than another).
-If the image is a meal (not a receipt), still populate estimated_prices with plausible per-ingredient UK
-grocery prices. Never return placeholder or zeroed-out values unless the image truly shows nothing edible,
-in which case set items to an empty array and explain why in "insight".`;
+estimating estimated_prices — a plausible low-high range per item (price_high should be realistically
+higher than price_low, not identical), not a comparison between specific supermarkets (you don't have
+real-time pricing, so never claim one named store is cheaper than another). If the image is a meal (not
+a receipt), still populate estimated_prices with plausible per-ingredient UK grocery price ranges. Never
+return placeholder or zeroed-out values unless the image truly shows nothing edible, in which case set
+items to an empty array and explain why in "insight".`;
 
   const response = await anthropic.messages.create({
     model: MODEL,
@@ -172,21 +174,28 @@ export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPrefe
     {
       "day": string,              // e.g. "Monday"
       "meals": [
-        { "type": "Breakfast" | "Lunch" | "Dinner", "name": string, "calories": number, "estimated_cost": number }
+        { "type": "Breakfast" | "Lunch" | "Dinner", "name": string, "calories": number, "cost_low": number, "cost_high": number }
       ]
     }
   ],
-  "total_estimated_cost": number,   // sum of all 21 meals' estimated_cost across the week, in GBP
+  "shopping_list": [
+    { "item": string, "quantity": string, "price_low": number, "price_high": number }
+  ],
+  "total_estimated_low": number,    // sum of shopping_list price_low, in GBP
+  "total_estimated_high": number,   // sum of shopping_list price_high, in GBP
   "average_daily_calories": number,
   "insight": string,                // one short sentence on how well this plan fits the goal + budget
   "currency": "GBP"
 }
 
 "days" must contain exactly 7 entries (Monday through Sunday), each with exactly 3 meals
-(Breakfast, Lunch, Dinner). Use realistic UK grocery pricing in GBP for each meal's ingredients — a
-single rough estimate, not a comparison between named supermarkets (you don't have real-time pricing,
+(Breakfast, Lunch, Dinner). "shopping_list" must consolidate the actual ingredients needed across the
+whole week into one buyable grocery list (e.g. "Chicken breast" with quantity "1kg", not repeated per
+meal) — combine duplicate ingredients across meals into a single line with a total quantity. Use
+realistic UK grocery pricing in GBP as a plausible low-high range per item (price_high meaningfully
+higher than price_low), not a comparison between named supermarkets (you don't have real-time pricing,
 so never claim one store is cheaper than another). Every day's total calories should land close
-to the user's daily calorie goal, and total_estimated_cost should stay at or under their weekly budget
+to the user's daily calorie goal, and total_estimated_high should stay at or under their weekly budget
 whenever realistically possible — if it truly can't be done, get as close as possible and say so plainly
 in "insight". Respect every listed dietary preference strictly (never suggest a non-vegetarian meal for
 a vegetarian, etc). Vary meals across the week rather than repeating the same dishes.`;
@@ -204,7 +213,7 @@ Generate this week's meal plan as the JSON object described in your instructions
 
   const mealPlanResponse = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 4000,
+    max_tokens: 4800,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }],
   });

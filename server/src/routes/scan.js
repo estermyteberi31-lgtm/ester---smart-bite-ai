@@ -67,7 +67,7 @@ router.post("/", upload.single("image"), async (req, res) => {
           account_id: DEFAULT_ACCOUNT_ID,
           item_name: row.item ?? "Item",
           store: "Estimated",
-          price_paid: Number(row.estimated_price) || 0,
+          price_paid: ((Number(row.price_low) || 0) + (Number(row.price_high) || 0)) / 2,
           amount_saved: 0,
         });
       }

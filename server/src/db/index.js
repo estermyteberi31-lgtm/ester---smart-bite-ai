@@ -69,9 +69,18 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id INTEGER NOT NULL REFERENCES accounts(id),
+    title TEXT NOT NULL DEFAULT 'New chat',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS chat_messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER NOT NULL REFERENCES accounts(id),
+    conversation_id INTEGER REFERENCES conversations(id),
     role TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -103,6 +112,7 @@ ensureColumn("accounts", "onboarding_completed", "INTEGER NOT NULL DEFAULT 0");
 ensureColumn("accounts", "goal", "TEXT NOT NULL DEFAULT ''");
 ensureColumn("accounts", "eating_habits", "TEXT NOT NULL DEFAULT ''");
 ensureColumn("accounts", "obstacles", "TEXT NOT NULL DEFAULT ''");
+ensureColumn("chat_messages", "conversation_id", "INTEGER REFERENCES conversations(id)");
 
 function ensureDefaultAccount() {
   const existing = db.prepare("SELECT id FROM accounts ORDER BY id ASC LIMIT 1").get();

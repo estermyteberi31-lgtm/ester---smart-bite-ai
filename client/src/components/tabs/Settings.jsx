@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import { NEON_COLORS } from "../../lib/colors.js";
+import { fetchMealPlanHistory } from "../../lib/api.js";
 
 const DIET_OPTIONS = [
   "Vegan",
@@ -20,10 +21,19 @@ export default function Settings() {
   const [error, setError] = useState(null);
   const [colorError, setColorError] = useState(null);
   const [pickingColor, setPickingColor] = useState(null);
+  const [planHistory, setPlanHistory] = useState([]);
+  const [loadingPlanHistory, setLoadingPlanHistory] = useState(true);
 
   useEffect(() => {
     if (settingsLoaded) setForm(settings);
   }, [settingsLoaded, settings]);
+
+  useEffect(() => {
+    fetchMealPlanHistory()
+      .then((data) => setPlanHistory(data.plans ?? []))
+      .catch(() => {})
+      .finally(() => setLoadingPlanHistory(false));
+  }, []);
 
   function toggleDiet(option) {
     setForm((prev) => {
@@ -240,6 +250,36 @@ export default function Settings() {
         </div>
       </section>
 
+      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "200ms" }}>
+        <h3 className="text-sm font-semibold text-white/80">Past meal plans</h3>
+        <p className="mt-1 text-xs text-white/40">Every weekly plan you've generated, newest first.</p>
+        {loadingPlanHistory ? (
+          <div className="mt-3 flex flex-col gap-2">
+            <div className="skeleton h-14 rounded-xl" />
+            <div className="skeleton h-14 rounded-xl" />
+          </div>
+        ) : planHistory.length === 0 ? (
+          <p className="mt-3 text-xs text-white/30">No plans generated yet — build one from the Dashboard.</p>
+        ) : (
+          <ul className="mt-3 flex flex-col gap-2">
+            {planHistory.map((entry) => (
+              <li key={entry.id} className="rounded-xl bg-black/20 p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-white/80">{formatPlanDate(entry.createdAt)}</span>
+                  <span className="text-white/50">
+                    £{Number(entry.plan?.total_estimated_low ?? 0).toFixed(2)}–£
+                    {Number(entry.plan?.total_estimated_high ?? 0).toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-1 text-white/40">
+                  {entry.calorieGoal} kcal/day goal · £{entry.weeklyBudget} budget
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <button
         type="button"
         onClick={handleSave}
@@ -262,4 +302,10 @@ function Field({ label, children }) {
       {children}
     </label>
   );
+}
+
+function formatPlanDate(isoString) {
+  if (!isoString) return "";
+  const date = new Date(`${isoString.replace(" ", "T")}Z`);
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }

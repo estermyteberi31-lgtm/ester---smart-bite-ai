@@ -29,6 +29,23 @@ router.get("/", (req, res) => {
   res.json({ latest: serializePlanRow(row) });
 });
 
+router.get("/history", (req, res) => {
+  const rows = db
+    .prepare(
+      `SELECT * FROM meal_plans WHERE account_id = ? ORDER BY created_at DESC, id DESC LIMIT 30`
+    )
+    .all(DEFAULT_ACCOUNT_ID);
+  res.json({ plans: rows.map(serializePlanRow) });
+});
+
+router.get("/:id", (req, res) => {
+  const row = db
+    .prepare(`SELECT * FROM meal_plans WHERE id = ? AND account_id = ?`)
+    .get(req.params.id, DEFAULT_ACCOUNT_ID);
+  if (!row) return res.status(404).json({ error: "Meal plan not found" });
+  res.json(serializePlanRow(row));
+});
+
 router.post("/", async (req, res) => {
   try {
     if (!isAnthropicConfigured()) {

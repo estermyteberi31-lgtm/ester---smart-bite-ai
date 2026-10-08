@@ -14,6 +14,7 @@ export default function MealPlan() {
   const [error, setError] = useState(null);
   const [weeklyNotes, setWeeklyNotes] = useState("");
   const [listening, setListening] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
   const latestTranscriptRef = useRef("");
 
   useEffect(() => {
@@ -22,6 +23,10 @@ export default function MealPlan() {
       .catch(() => {})
       .finally(() => setInitialLoading(false));
   }, []);
+
+  useEffect(() => {
+    setCheckedItems({});
+  }, [plan?.id]);
 
   useEffect(() => {
     if (!isNative) return;
@@ -110,7 +115,7 @@ export default function MealPlan() {
     }
   }
 
-  const overBudget = plan && plan.plan.total_estimated_cost > plan.weeklyBudget;
+  const overBudget = plan && plan.plan.total_estimated_high > plan.weeklyBudget;
 
   return (
     <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "40ms" }}>
@@ -194,7 +199,7 @@ export default function MealPlan() {
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className="rounded-xl bg-black/20 py-2">
               <p className="text-sm font-semibold" style={{ color: overBudget ? "#f87171" : "#4ade80" }}>
-                £<AnimatedNumber value={plan.plan.total_estimated_cost ?? 0} formatter={(n) => n.toFixed(2)} />
+                £{(plan.plan.total_estimated_low ?? 0).toFixed(2)}–£{(plan.plan.total_estimated_high ?? 0).toFixed(2)}
               </p>
               <p className="text-[10px] uppercase tracking-wide text-white/40">
                 of £{plan.weeklyBudget} budget
@@ -225,7 +230,7 @@ export default function MealPlan() {
                       <p className="text-white/40">{meal.type}</p>
                       <p className="text-white/80">{meal.name}</p>
                       <p className="text-white/40">
-                        {meal.calories} kcal · £{Number(meal.estimated_cost ?? 0).toFixed(2)}
+                        {meal.calories} kcal · £{Number(meal.cost_low ?? 0).toFixed(2)}–£{Number(meal.cost_high ?? 0).toFixed(2)}
                       </p>
                     </li>
                   ))}
@@ -233,6 +238,37 @@ export default function MealPlan() {
               </div>
             ))}
           </div>
+
+          {Array.isArray(plan.plan.shopping_list) && plan.plan.shopping_list.length > 0 && (
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+              <p className="text-xs font-semibold text-white/80">Shopping list</p>
+              <ul className="mt-2 flex flex-col gap-1.5">
+                {plan.plan.shopping_list.map((item, idx) => {
+                  const checked = Boolean(checkedItems[idx]);
+                  return (
+                    <li key={idx}>
+                      <label className="flex cursor-pointer items-center gap-2.5 py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => setCheckedItems((prev) => ({ ...prev, [idx]: !prev[idx] }))}
+                          className="h-4 w-4 shrink-0 rounded border-white/20 bg-transparent"
+                          style={{ accentColor: "var(--accent)" }}
+                        />
+                        <span className={`flex-1 text-xs ${checked ? "text-white/30 line-through" : "text-white/80"}`}>
+                          {item.item}
+                          {item.quantity ? <span className="text-white/40"> · {item.quantity}</span> : null}
+                        </span>
+                        <span className="shrink-0 text-[11px] text-white/40">
+                          £{Number(item.price_low ?? 0).toFixed(2)}–£{Number(item.price_high ?? 0).toFixed(2)}
+                        </span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </section>

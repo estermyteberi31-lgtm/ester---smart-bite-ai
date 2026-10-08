@@ -93,6 +93,11 @@ export async function fetchMealPlan() {
   return handleResponse(res);
 }
 
+export async function fetchMealPlanHistory() {
+  const res = await fetch(`${BASE_URL}/meal-plan/history`);
+  return handleResponse(res);
+}
+
 export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPreferences, weeklyNotes }) {
   const res = await fetch(`${BASE_URL}/meal-plan`, {
     method: "POST",
@@ -102,24 +107,36 @@ export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPrefe
   return handleResponse(res);
 }
 
-export async function fetchChatHistory() {
-  const res = await fetch(`${BASE_URL}/chat/history`);
+export async function fetchConversations() {
+  const res = await fetch(`${BASE_URL}/chat/conversations`);
   return handleResponse(res);
 }
 
-export async function sendChatMessage(message) {
+export async function fetchConversationMessages(conversationId) {
+  const res = await fetch(`${BASE_URL}/chat/conversations/${conversationId}/messages`);
+  return handleResponse(res);
+}
+
+export async function deleteConversation(conversationId) {
+  const res = await fetch(`${BASE_URL}/chat/conversations/${conversationId}`, { method: "DELETE" });
+  if (res.status === 204) return true;
+  return handleResponse(res);
+}
+
+export async function sendChatMessage(message, conversationId) {
   const res = await fetch(`${BASE_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, conversationId }),
   });
   return handleResponse(res);
 }
 
-export async function sendChatImage(file, caption) {
+export async function sendChatImage(file, caption, conversationId) {
   const formData = new FormData();
   formData.append("image", file);
   formData.append("caption", caption ?? "");
+  if (conversationId) formData.append("conversationId", conversationId);
   const res = await fetch(`${BASE_URL}/chat/image`, { method: "POST", body: formData });
   return handleResponse(res);
 }
