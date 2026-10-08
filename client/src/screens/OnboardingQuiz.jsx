@@ -3,7 +3,6 @@ import { useAppContext } from "../context/AppContext.jsx";
 import Logo from "../components/Logo.jsx";
 
 const DIET_OPTIONS = [
-  "Vegetarian",
   "Vegan",
   "Pescatarian",
   "Gluten-Free",

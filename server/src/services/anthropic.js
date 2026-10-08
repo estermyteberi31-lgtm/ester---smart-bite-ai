@@ -63,19 +63,20 @@ receipts and return ONLY a single JSON object (no prose, no markdown fences) mat
   "totals": { "calories": number, "protein_g": number, "carbs_g": number, "fat_g": number },
   "nutrition_score": number,       // 0-100 overall healthiness score for what was scanned
   "macro_split": { "protein_pct": number, "carbs_pct": number, "fat_pct": number },
-  "price_comparison": [
-    { "item": string, "tesco_price": number, "aldi_price": number, "cheaper_store": "Tesco" | "Aldi", "savings": number }
+  "estimated_prices": [
+    { "item": string, "estimated_price": number }
   ],
-  "estimated_total_savings": number,
+  "estimated_total_cost": number,
   "insight": string,               // one short actionable sentence
   "currency": "GBP"
 }
 
-Base every number on what is actually visible in the image. Use realistic UK supermarket pricing in GBP for
-Tesco and Aldi when estimating price_comparison. If the image is a meal (not a receipt), still populate
-price_comparison with plausible per-ingredient UK grocery prices. Never return placeholder or zeroed-out
-values unless the image truly shows nothing edible, in which case set items to an empty array and explain
-why in "insight".`;
+Base every number on what is actually visible in the image. Use realistic UK grocery pricing in GBP when
+estimating estimated_prices — a single rough estimate per item, not a comparison between specific
+supermarkets (you don't have real-time pricing, so never claim one named store is cheaper than another).
+If the image is a meal (not a receipt), still populate estimated_prices with plausible per-ingredient UK
+grocery prices. Never return placeholder or zeroed-out values unless the image truly shows nothing edible,
+in which case set items to an empty array and explain why in "insight".`;
 
   const response = await anthropic.messages.create({
     model: MODEL,
@@ -171,7 +172,7 @@ export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPrefe
     {
       "day": string,              // e.g. "Monday"
       "meals": [
-        { "type": "Breakfast" | "Lunch" | "Dinner", "name": string, "calories": number, "estimated_cost": number, "store": "Tesco" | "Aldi" }
+        { "type": "Breakfast" | "Lunch" | "Dinner", "name": string, "calories": number, "estimated_cost": number }
       ]
     }
   ],
@@ -182,8 +183,9 @@ export async function generateMealPlan({ calorieGoal, weeklyBudget, dietaryPrefe
 }
 
 "days" must contain exactly 7 entries (Monday through Sunday), each with exactly 3 meals
-(Breakfast, Lunch, Dinner). Use realistic UK supermarket pricing in GBP for Tesco and Aldi, picking
-whichever store is cheaper for each meal's ingredients. Every day's total calories should land close
+(Breakfast, Lunch, Dinner). Use realistic UK grocery pricing in GBP for each meal's ingredients — a
+single rough estimate, not a comparison between named supermarkets (you don't have real-time pricing,
+so never claim one store is cheaper than another). Every day's total calories should land close
 to the user's daily calorie goal, and total_estimated_cost should stay at or under their weekly budget
 whenever realistically possible — if it truly can't be done, get as close as possible and say so plainly
 in "insight". Respect every listed dietary preference strictly (never suggest a non-vegetarian meal for
@@ -216,6 +218,11 @@ You only discuss food, diet, nutrition, meal planning, and calories.
 If asked about anything unrelated to food or nutrition, politely say
 you only know about nutrition and redirect the conversation.
 
+Keep replies short — a few sentences at most, not a wall of text. If you greet the user, keep it
+generic ("Hi!", "Hope you're having a good one") — never guess the time of day ("good morning",
+"good evening"), since you don't actually know what time it is for them. Words like breakfast, lunch,
+and dinner are fine when talking about meals specifically — that's not a time-of-day guess.
+
 Here is what the user has told you about themselves:
 ${userProfile || "The user hasn't added any personal info yet."}
 
@@ -234,7 +241,7 @@ export async function chatWithNutritionAssistant({ messages, userProfile }) {
 
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 700,
+    max_tokens: 300,
     system: buildNutritionSystemPrompt(userProfile),
     messages: messages.map((message) => ({ role: message.role, content: message.content })),
   });
@@ -273,7 +280,7 @@ export async function chatWithNutritionAssistantAboutImage({
 
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 700,
+    max_tokens: 300,
     system: buildNutritionSystemPrompt(userProfile),
     messages: [...(history ?? []).map((message) => ({ role: message.role, content: message.content })), imageMessage],
   });

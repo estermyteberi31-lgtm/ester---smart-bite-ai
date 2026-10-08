@@ -161,7 +161,7 @@ function ScanResults({ result }) {
   const totals = result.totals ?? {};
   const macros = result.macro_split ?? {};
   const items = Array.isArray(result.items) ? result.items : [];
-  const prices = Array.isArray(result.price_comparison) ? result.price_comparison : [];
+  const prices = Array.isArray(result.estimated_prices) ? result.estimated_prices : [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -207,34 +207,25 @@ function ScanResults({ result }) {
       {prices.length > 0 && (
         <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "80ms" }}>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white/80">Tesco vs Aldi</h3>
-            {typeof result.estimated_total_savings === "number" && (
-              <span className="rounded-full bg-green-500/15 px-2.5 py-1 text-xs font-semibold text-green-300">
-                Save £{result.estimated_total_savings.toFixed(2)}
+            <h3 className="text-sm font-semibold text-white/80">Estimated cost</h3>
+            {typeof result.estimated_total_cost === "number" && (
+              <span
+                className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+              >
+                £{result.estimated_total_cost.toFixed(2)}
               </span>
             )}
           </div>
           <ul className="mt-3 flex flex-col gap-2">
             {prices.map((row, idx) => (
-              <li key={idx} className="rounded-xl bg-black/20 p-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-white/80">{row.item}</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                      row.cheaper_store === "Aldi" ? "bg-blue-500/20 text-blue-300" : "bg-orange-500/20 text-orange-300"
-                    }`}
-                  >
-                    Cheaper at {row.cheaper_store}
-                  </span>
-                </div>
-                <div className="mt-1.5 flex items-center gap-4 text-xs text-white/50">
-                  <span>Tesco £{Number(row.tesco_price ?? 0).toFixed(2)}</span>
-                  <span>Aldi £{Number(row.aldi_price ?? 0).toFixed(2)}</span>
-                  <span className="text-green-400">Save £{Number(row.savings ?? 0).toFixed(2)}</span>
-                </div>
+              <li key={idx} className="flex items-center justify-between rounded-xl bg-black/20 p-3 text-sm">
+                <span className="font-medium text-white/80">{row.item}</span>
+                <span className="text-white/50">£{Number(row.estimated_price ?? 0).toFixed(2)}</span>
               </li>
             ))}
           </ul>
+          <p className="mt-2 text-[10px] text-white/30">Rough estimates — not pulled from live prices.</p>
         </section>
       )}
     </div>

@@ -3,7 +3,6 @@ import { useAppContext } from "../../context/AppContext.jsx";
 import { NEON_COLORS } from "../../lib/colors.js";
 
 const DIET_OPTIONS = [
-  "Vegetarian",
   "Vegan",
   "Pescatarian",
   "Gluten-Free",

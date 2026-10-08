@@ -60,19 +60,19 @@ router.post("/", upload.single("image"), async (req, res) => {
       raw_json: JSON.stringify(result),
     });
 
-    const priceComparison = Array.isArray(result.price_comparison) ? result.price_comparison : [];
+    const estimatedPrices = Array.isArray(result.estimated_prices) ? result.estimated_prices : [];
     const insertMany = db.transaction((rows) => {
       for (const row of rows) {
         insertBudgetEntry.run({
           account_id: DEFAULT_ACCOUNT_ID,
           item_name: row.item ?? "Item",
-          store: row.cheaper_store ?? "Tesco",
-          price_paid: Number(row.cheaper_store === "Aldi" ? row.aldi_price : row.tesco_price) || 0,
-          amount_saved: Number(row.savings) || 0,
+          store: "Estimated",
+          price_paid: Number(row.estimated_price) || 0,
+          amount_saved: 0,
         });
       }
     });
-    if (priceComparison.length > 0) insertMany(priceComparison);
+    if (estimatedPrices.length > 0) insertMany(estimatedPrices);
 
     res.json({ ...result, gymMode, chatMessage });
   } catch (error) {

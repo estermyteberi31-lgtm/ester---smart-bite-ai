@@ -222,18 +222,7 @@ export default function MealPlan() {
                 <ul className="mt-2 flex flex-col gap-2">
                   {(day.meals ?? []).map((meal, mealIdx) => (
                     <li key={mealIdx} className="text-[11px]">
-                      <div className="flex items-center justify-between text-white/40">
-                        <span>{meal.type}</span>
-                        <span
-                          className="rounded px-1 text-[9px] font-semibold"
-                          style={{
-                            backgroundColor: meal.store === "Aldi" ? "#3b82f6" : "#f97316",
-                            color: "#0f0b1a",
-                          }}
-                        >
-                          {meal.store}
-                        </span>
-                      </div>
+                      <p className="text-white/40">{meal.type}</p>
                       <p className="text-white/80">{meal.name}</p>
                       <p className="text-white/40">
                         {meal.calories} kcal · £{Number(meal.estimated_cost ?? 0).toFixed(2)}
