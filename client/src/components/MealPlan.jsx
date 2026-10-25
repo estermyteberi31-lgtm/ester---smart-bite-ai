@@ -185,7 +185,7 @@ export default function MealPlan() {
 
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
 
-      {(loading || initialLoading) && !plan && <MealPlanSkeleton />}
+      {(loading || initialLoading) && <MealPlanSkeleton />}
 
       {!loading && !initialLoading && !plan && (
         <p className="mt-4 text-xs text-white/40">
@@ -194,7 +194,7 @@ export default function MealPlan() {
         </p>
       )}
 
-      {plan && !loading && (
+      {plan && !loading && !initialLoading && (
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className="rounded-xl bg-black/20 py-2">

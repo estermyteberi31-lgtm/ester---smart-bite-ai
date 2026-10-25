@@ -211,7 +211,7 @@ export default function OnboardingQuiz() {
           )}
 
           {step === "budget" && (
-            <QuizStep title="Weekly grocery budget" subtitle="Helps us compare Tesco vs Aldi prices for you.">
+            <QuizStep title="Weekly grocery budget" subtitle="Helps us estimate costs and build meal plans that fit.">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40">£</span>
                 <input
