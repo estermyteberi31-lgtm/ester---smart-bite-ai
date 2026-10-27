@@ -6,7 +6,6 @@ const PAD_BOTTOM = 24;
 
 const LINES = [
   { key: "nutritionScore", color: "#a855f7", label: "Nutrition Score" },
-  { key: "moneySaved", color: "#22c55e", label: "Money Saved" },
   { key: "workoutsCompleted", color: "#3b82f6", label: "Workouts Completed" },
 ];
 

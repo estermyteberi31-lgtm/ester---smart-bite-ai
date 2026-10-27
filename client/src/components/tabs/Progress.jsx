@@ -1,19 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppContext } from "../../context/AppContext.jsx";
 import ProgressChart from "../ProgressChart.jsx";
-import { fetchBudget } from "../../lib/api.js";
 import AnimatedNumber from "../AnimatedNumber.jsx";
 
 export default function Progress() {
   const { progressSeries, hydrationToday, logHydration } = useAppContext();
-  const [totalSaved, setTotalSaved] = useState(0);
   const [dropletBusy, setDropletBusy] = useState(false);
-
-  useEffect(() => {
-    fetchBudget()
-      .then((data) => setTotalSaved(data.totalSaved ?? 0))
-      .catch(() => {});
-  }, [progressSeries]);
 
   async function handleDroplet() {
     setDropletBusy(true);
@@ -26,7 +18,6 @@ export default function Progress() {
 
   const latest = progressSeries[progressSeries.length - 1] ?? {
     nutritionScore: 0,
-    moneySaved: 0,
     workoutsCompleted: 0,
   };
 
@@ -40,9 +31,8 @@ export default function Progress() {
         </div>
       </section>
 
-      <section className="card-enter grid grid-cols-3 gap-2" style={{ "--delay": "70ms" }}>
+      <section className="card-enter grid grid-cols-2 gap-2" style={{ "--delay": "70ms" }}>
         <MiniStat color="#a855f7" label="Nutrition" value={latest.nutritionScore} />
-        <MiniStat color="#22c55e" label="Saved" value={totalSaved} formatter={(n) => `£${n.toFixed(2)}`} />
         <MiniStat color="#3b82f6" label="Workouts" value={latest.workoutsCompleted} />
       </section>
 
