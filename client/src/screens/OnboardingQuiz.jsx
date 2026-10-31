@@ -10,6 +10,7 @@ const DIET_OPTIONS = [
   "Keto",
   "Halal",
   "Kosher",
+  "Other",
 ];
 
 const GOAL_OPTIONS = ["Lose weight", "Build muscle", "Eat healthier", "Maintain weight"];
@@ -33,6 +34,7 @@ export default function OnboardingQuiz() {
     obstacles: settings.obstacles || "",
     name: settings.name || "",
     dietary_preferences: settings.dietary_preferences || [],
+    dietary_other: "",
     calorie_goal: settings.calorie_goal || 2200,
     weekly_budget: settings.weekly_budget || 60,
     custom_notes: settings.custom_notes || "",
@@ -65,6 +67,13 @@ export default function OnboardingQuiz() {
     });
   }
 
+  function resolvedDietaryPreferences() {
+    const other = form.dietary_other.trim();
+    return form.dietary_preferences
+      .filter((item) => item !== "Other")
+      .concat(form.dietary_preferences.includes("Other") && other ? [other] : []);
+  }
+
   async function finish() {
     setSaving(true);
     setError(null);
@@ -74,7 +83,7 @@ export default function OnboardingQuiz() {
         eating_habits: form.eating_habits,
         obstacles: form.obstacles,
         name: form.name,
-        dietary_preferences: form.dietary_preferences,
+        dietary_preferences: resolvedDietaryPreferences(),
         calorie_goal: Number(form.calorie_goal),
         weekly_budget: Number(form.weekly_budget),
         custom_notes: form.custom_notes,
@@ -194,6 +203,16 @@ export default function OnboardingQuiz() {
                   );
                 })}
               </div>
+              {form.dietary_preferences.includes("Other") && (
+                <input
+                  type="text"
+                  value={form.dietary_other}
+                  onChange={(event) => setForm((prev) => ({ ...prev, dietary_other: event.target.value }))}
+                  placeholder="Tell us what"
+                  className="input mt-3"
+                  autoFocus
+                />
+              )}
             </QuizStep>
           )}
 
