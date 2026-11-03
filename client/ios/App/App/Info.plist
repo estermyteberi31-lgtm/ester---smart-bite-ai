@@ -29,6 +29,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>SmartBite AI uses your camera so you can scan food and receipts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SmartBite AI uses your photo library so you can pick an existing photo of food or a receipt to scan.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>SmartBite AI uses your microphone so you can tell it about your week by voice instead of typing.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
