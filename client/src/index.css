@@ -7,10 +7,10 @@
 }
 
 :root {
-  /* Default neon accent (Purple) — overridden at runtime from the user's
+  /* Default neon accent (Green) — overridden at runtime from the user's
      saved preference via applyAccentColor() in lib/colors.js. */
-  --accent: #a855f7;
-  --accent-contrast: #ffffff;
+  --accent: #22c55e;
+  --accent-contrast: #000000;
 }
 
 html,

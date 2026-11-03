@@ -4,8 +4,8 @@ import { computeCurrentStreak, STREAK_UNLOCK_DAYS } from "../services/streak.js"
 
 const router = Router();
 
-const FREE_COLORS = ["purple"];
-const LOCKED_COLORS = ["white", "pink", "blue", "green", "red", "yellow"];
+const FREE_COLORS = ["green"];
+const LOCKED_COLORS = ["purple", "white", "pink", "blue", "red", "yellow"];
 const ALL_COLORS = [...FREE_COLORS, ...LOCKED_COLORS];
 
 function serializeAccount(row) {

@@ -25,7 +25,7 @@ db.exec(`
     calorie_goal INTEGER NOT NULL DEFAULT 2200,
     weekly_budget REAL NOT NULL DEFAULT 60,
     preferred_gym_mode TEXT NOT NULL DEFAULT 'home',
-    accent_color TEXT NOT NULL DEFAULT 'purple',
+    accent_color TEXT NOT NULL DEFAULT 'green',
     custom_notes TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -106,7 +106,7 @@ function ensureColumn(table, column, definition) {
   }
 }
 
-ensureColumn("accounts", "accent_color", "TEXT NOT NULL DEFAULT 'purple'");
+ensureColumn("accounts", "accent_color", "TEXT NOT NULL DEFAULT 'green'");
 ensureColumn("accounts", "custom_notes", "TEXT NOT NULL DEFAULT ''");
 ensureColumn("accounts", "onboarding_completed", "INTEGER NOT NULL DEFAULT 0");
 ensureColumn("accounts", "goal", "TEXT NOT NULL DEFAULT ''");
@@ -130,7 +130,7 @@ function ensureDefaultAccount() {
       calorie_goal: 2200,
       weekly_budget: 60,
       preferred_gym_mode: "home",
-      accent_color: "purple",
+      accent_color: "green",
     });
   return result.lastInsertRowid;
 }
