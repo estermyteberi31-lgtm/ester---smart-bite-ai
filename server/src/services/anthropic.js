@@ -106,6 +106,75 @@ items to an empty array and explain why in "insight".`;
 }
 
 /**
+ * Looks at a photo of a fridge/pantry/ingredients and suggests recipes
+ * buildable mostly from what's visible, flagging a few extra ingredients
+ * that would make each recipe better if the user happens to have them.
+ */
+export async function analyzeFridgeForRecipes({ base64Image, mediaType, userNote, userProfile }) {
+  const anthropic = getClient();
+  if (!anthropic) {
+    throw new Error("ANTHROPIC_API_KEY is not configured on the server");
+  }
+
+  const userNoteContext =
+    userNote && userNote.trim().length > 0
+      ? `The user added this note: "${userNote.trim()}"`
+      : "The user did not add any extra note.";
+
+  const systemPrompt = `You are Bite, the cooking assistant inside SmartBite AI. You look at a photo of
+someone's fridge, pantry, or countertop ingredients and help them figure out what to cook with what they
+already have. Return ONLY a single JSON object (no prose, no markdown fences) matching exactly this shape:
+
+{
+  "detected_ingredients": [string],   // plausible ingredients you can actually see in the photo
+  "recipes": [
+    {
+      "name": string,
+      "description": string,          // one short appetising sentence
+      "uses_ingredients": [string],   // which detected ingredients this recipe uses
+      "missing_ingredients": [string],// a short list (0-4) of extra ingredients that would make it better
+      "steps": [string],              // short, simple steps (4-7 of them)
+      "estimated_time_minutes": number
+    }
+  ],
+  "bite_message": string              // one short, warm, in-character sentence from Bite introducing the
+                                       // suggestions, e.g. offering to improve a recipe with a couple more
+                                       // ingredients if the user has them
+}
+
+Suggest 2-3 recipes, ranked with the most achievable (fewest missing ingredients) first. Respect the
+user's dietary preferences strictly if given. Keep "steps" genuinely simple — assume a home cook, not a
+chef. If the photo doesn't show enough to work with, return an empty "recipes" array and explain why in
+"bite_message".
+
+Here is what the user has told you about themselves: ${userProfile || "Nothing yet."}`;
+
+  const response = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 2000,
+    system: systemPrompt,
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image",
+            source: { type: "base64", media_type: mediaType, data: base64Image },
+          },
+          {
+            type: "text",
+            text: `${userNoteContext}\nLook at this photo and suggest what I could cook, as the JSON object described in your instructions.`,
+          },
+        ],
+      },
+    ],
+  });
+
+  const text = response.content.find((block) => block.type === "text")?.text ?? "";
+  return extractJson(text);
+}
+
+/**
  * Asks Claude for a structured workout routine tailored to gym/home mode,
  * a target style, and the user's profile.
  */
@@ -222,10 +291,12 @@ Generate this week's meal plan as the JSON object described in your instructions
   return extractJson(mealPlanText);
 }
 
-const buildNutritionSystemPrompt = (userProfile) => `You are a nutrition assistant inside SmartBite AI.
-You only discuss food, diet, nutrition, meal planning, and calories.
-If asked about anything unrelated to food or nutrition, politely say
-you only know about nutrition and redirect the conversation.
+const buildNutritionSystemPrompt = (userProfile) => `You are Bite, the cooking and nutrition assistant
+inside SmartBite AI. You help with food, cooking, recipes, ingredient swaps, diet, meal planning, and
+calories — including follow-up questions about recipes you or the fridge-scanner just suggested (like
+swapping an ingredient, or how to make something better with what's on hand).
+If asked about anything unrelated to food or cooking, politely say
+that's outside what you (Bite) can help with and redirect the conversation.
 
 Keep replies short — a few sentences at most, not a wall of text. If you greet the user, keep it
 generic ("Hi!", "Hope you're having a good one") — never guess the time of day ("good morning",

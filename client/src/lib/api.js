@@ -26,6 +26,14 @@ export async function scanImage({ file, chatMessage, gymMode }) {
   return handleResponse(res);
 }
 
+export async function analyzeFridge({ file, note }) {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("note", note ?? "");
+  const res = await fetch(`${BASE_URL}/fridge`, { method: "POST", body: formData });
+  return handleResponse(res);
+}
+
 export async function generateWorkout({ mode, style, profile }) {
   const res = await fetch(`${BASE_URL}/workout`, {
     method: "POST",
