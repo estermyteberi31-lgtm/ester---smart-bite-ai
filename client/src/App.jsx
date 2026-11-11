@@ -1,47 +1,53 @@
 import { useAppContext } from "./context/AppContext.jsx";
 import NavBar from "./components/NavBar.jsx";
 import Logo from "./components/Logo.jsx";
-import Dashboard from "./components/tabs/Dashboard.jsx";
-import Workouts from "./components/tabs/Workouts.jsx";
-import Progress from "./components/tabs/Progress.jsx";
+import Home from "./components/tabs/Home.jsx";
+import Maker from "./components/tabs/Maker.jsx";
+import Calendar from "./components/tabs/Calendar.jsx";
 import Settings from "./components/tabs/Settings.jsx";
 import OnboardingQuiz from "./screens/OnboardingQuiz.jsx";
 
 const TAB_COMPONENTS = {
-  dashboard: Dashboard,
-  workouts: Workouts,
-  progress: Progress,
+  home: Home,
+  maker: Maker,
+  calendar: Calendar,
   settings: Settings,
 };
 
 const TAB_TITLES = {
-  dashboard: "Dashboard",
-  workouts: "Chat",
-  progress: "Progress",
+  home: "Home",
+  maker: "Maker",
+  calendar: "Calendar",
   settings: "Settings",
 };
 
 export default function App() {
   const { activeTab, settings, settingsLoaded } = useAppContext();
-  const ActiveTabComponent = TAB_COMPONENTS[activeTab] ?? Dashboard;
+  const ActiveTabComponent = TAB_COMPONENTS[activeTab] ?? Home;
 
   if (settingsLoaded && !settings.onboarding_completed) {
     return <OnboardingQuiz />;
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0b1a] text-white">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page)", color: "var(--text-primary)" }}>
       <div className="mx-auto flex min-h-screen max-w-md flex-col">
-        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#0f0b1a]/90 px-5 py-4 backdrop-blur">
+        <header
+          className="sticky top-0 z-40 flex items-center justify-between border-b px-5 py-4 backdrop-blur"
+          style={{ borderColor: "var(--border-subtle)", backgroundColor: "color-mix(in srgb, var(--bg-page) 92%, transparent)" }}
+        >
           <div className="flex items-center gap-2">
             <div
-              className="glow-accent flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black transition-transform active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border"
+              style={{ borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
             >
               <Logo className="h-6 w-6" />
             </div>
             <div>
               <p className="text-sm font-semibold leading-none">SmartBite AI</p>
-              <p className="text-[11px] leading-none text-white/40">{TAB_TITLES[activeTab]}</p>
+              <p className="mt-1 text-[11px] leading-none" style={{ color: "var(--text-secondary)" }}>
+                {TAB_TITLES[activeTab]}
+              </p>
             </div>
           </div>
         </header>

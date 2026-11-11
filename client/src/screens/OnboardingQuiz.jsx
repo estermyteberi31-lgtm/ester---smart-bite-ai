@@ -122,7 +122,10 @@ export default function OnboardingQuiz() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#0f0b1a] px-6 py-10 text-white">
+    <div
+      className="flex min-h-screen flex-col px-6 py-10"
+      style={{ backgroundColor: "var(--bg-page)", color: "var(--text-primary)" }}
+    >
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col">
         {questionIndex !== -1 && (
           <div className="mb-8 flex justify-center gap-1.5">
@@ -130,7 +133,7 @@ export default function OnboardingQuiz() {
               <span
                 key={s}
                 className="h-1.5 w-6 rounded-full transition-colors"
-                style={{ backgroundColor: idx <= questionIndex ? "var(--accent)" : "rgba(255,255,255,0.1)" }}
+                style={{ backgroundColor: idx <= questionIndex ? "var(--accent)" : "var(--border-subtle)" }}
               />
             ))}
           </div>
@@ -139,13 +142,16 @@ export default function OnboardingQuiz() {
         <div className="flex-1">
           {step === "welcome" && (
             <div className="card-enter flex flex-col items-center text-center">
-              <div className="glow-accent mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-black">
+              <div
+                className="glow-accent mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border"
+                style={{ borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+              >
                 <Logo className="h-9 w-9" />
               </div>
               <h1 className="text-2xl font-bold">Welcome to SmartBite AI</h1>
-              <p className="mt-2 text-sm text-white/50">
-                Let's set up your profile so meal plans, scans, and chat are personalised to you. Takes under a
-                minute.
+              <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                Meet Bite — your cooking assistant. Let's set up your profile so recipes, meal plans, and
+                chat are personalised to you. Takes under a minute.
               </p>
             </div>
           )}
@@ -195,7 +201,7 @@ export default function OnboardingQuiz() {
                       style={
                         active
                           ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }
-                          : { color: "rgba(255,255,255,0.5)", backgroundColor: "rgba(255,255,255,0.05)" }
+                          : { color: "var(--text-secondary)", backgroundColor: "var(--bg-muted)" }
                       }
                     >
                       {option}
@@ -232,7 +238,12 @@ export default function OnboardingQuiz() {
           {step === "budget" && (
             <QuizStep title="Weekly grocery budget" subtitle="Helps us estimate costs and build meal plans that fit.">
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40">£</span>
+                <span
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  £
+                </span>
                 <input
                   type="number"
                   min="0"
@@ -248,7 +259,7 @@ export default function OnboardingQuiz() {
 
           {step === "notes" && (
             <QuizStep
-              title="Tell the AI about you"
+              title="Tell Bite about you"
               subtitle="Age, training schedule, foods you hate, intolerances — anything."
             >
               <textarea
@@ -280,14 +291,14 @@ export default function OnboardingQuiz() {
                 </svg>
               </div>
               <h1 className="text-2xl font-bold">You're all set</h1>
-              <p className="mt-2 text-sm text-white/50">
-                We'll use this to personalise your scans, meal plans, and chat.
+              <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                Bite will use this to personalise your recipes, meal plans, and chat.
               </p>
             </div>
           )}
         </div>
 
-        {error && <p className="mt-3 text-center text-xs text-red-400">{error}</p>}
+        {error && <p className="mt-3 text-center text-xs text-red-500">{error}</p>}
 
         <div className="mt-8 flex flex-col gap-3">
           <div className="flex gap-3">
@@ -296,7 +307,8 @@ export default function OnboardingQuiz() {
                 type="button"
                 onClick={goBack}
                 disabled={saving}
-                className="flex-1 rounded-xl bg-white/5 py-3 text-sm font-semibold text-white/70 transition-all active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+                style={{ backgroundColor: "var(--bg-muted)", color: "var(--text-secondary)" }}
               >
                 Back
               </button>
@@ -307,7 +319,7 @@ export default function OnboardingQuiz() {
                 onClick={goNext}
                 disabled={saving}
                 className="glow-accent flex-1 rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
-                style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+                style={{ backgroundColor: "var(--cta)", color: "var(--cta-contrast)" }}
               >
                 {saving ? "Saving..." : isLast ? "Get started" : step === "welcome" ? "Let's go" : "Next"}
               </button>
@@ -318,7 +330,8 @@ export default function OnboardingQuiz() {
               type="button"
               onClick={handleSkip}
               disabled={saving}
-              className="text-center text-xs text-white/30 underline-offset-2 hover:underline disabled:opacity-50"
+              className="text-center text-xs underline-offset-2 hover:underline disabled:opacity-50"
+              style={{ color: "var(--text-secondary)" }}
             >
               Skip for now
             </button>
@@ -343,7 +356,7 @@ function OptionList({ options, selected, onSelect }) {
             style={
               active
                 ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)", borderColor: "var(--accent)" }
-                : { color: "rgba(255,255,255,0.8)", backgroundColor: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)" }
+                : { color: "var(--text-primary)", backgroundColor: "var(--bg-card)", borderColor: "var(--border-subtle)" }
             }
           >
             {option}
@@ -359,7 +372,11 @@ function QuizStep({ title, subtitle, children }) {
     <div className="card-enter flex flex-col gap-4">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-white/40">{subtitle}</p>}
+        {subtitle && (
+          <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+            {subtitle}
+          </p>
+        )}
       </div>
       {children}
     </div>

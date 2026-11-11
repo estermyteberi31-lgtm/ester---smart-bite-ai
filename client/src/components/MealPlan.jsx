@@ -118,18 +118,23 @@ export default function MealPlan() {
   const overBudget = plan && plan.plan.total_estimated_high > plan.weeklyBudget;
 
   return (
-    <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "40ms" }}>
+    <section
+      className="card-enter rounded-2xl border p-4"
+      style={{ "--delay": "40ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+    >
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold">Weekly meal plan</h2>
-          <p className="text-xs text-white/40">Fits your calorie goal and grocery budget</p>
+          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+            Fits your calorie goal and grocery budget
+          </p>
         </div>
       </div>
 
       <div className="mt-4 flex flex-col items-center text-center">
         {isNative && (
           <>
-            <p className="text-sm font-medium text-white/80">Tell us about your week</p>
+            <p className="text-sm font-medium">Tell us about your week</p>
             <button
               type="button"
               onPointerDown={handleMicDown}
@@ -140,7 +145,7 @@ export default function MealPlan() {
               className={`glow-accent mt-4 flex h-20 w-20 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-50 ${
                 listening ? "flame-pulse" : ""
               }`}
-              style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+              style={{ backgroundColor: "var(--cta)", color: "var(--cta-contrast)" }}
             >
               <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8">
                 <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.8" />
@@ -148,7 +153,7 @@ export default function MealPlan() {
                 <path d="M12 18v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
             </button>
-            <p className="mt-3 text-xs text-white/40">
+            <p className="mt-3 text-xs" style={{ color: "var(--text-secondary)" }}>
               {listening ? "Listening..." : "Hold to speak, release to generate"}
             </p>
           </>
@@ -170,7 +175,7 @@ export default function MealPlan() {
             onClick={() => handleGenerate()}
             disabled={loading}
             className="glow-accent shrink-0 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
-            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+            style={{ backgroundColor: "var(--cta)", color: "var(--cta-contrast)" }}
           >
             {loading ? (
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -183,12 +188,12 @@ export default function MealPlan() {
         </div>
       </div>
 
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
 
       {(loading || initialLoading) && <MealPlanSkeleton />}
 
       {!loading && !initialLoading && !plan && (
-        <p className="mt-4 text-xs text-white/40">
+        <p className="mt-4 text-xs" style={{ color: "var(--text-secondary)" }}>
           No plan yet — tap above to build 7 days of meals that hit £{settings.weekly_budget} and{" "}
           {settings.calorie_goal} kcal/day.
         </p>
@@ -197,39 +202,44 @@ export default function MealPlan() {
       {plan && !loading && !initialLoading && (
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-2 text-center">
-            <div className="rounded-xl bg-black/20 py-2">
-              <p className="text-sm font-semibold" style={{ color: overBudget ? "#f87171" : "#4ade80" }}>
+            <div className="rounded-xl py-2" style={{ backgroundColor: "var(--bg-muted)" }}>
+              <p className="text-sm font-semibold" style={{ color: overBudget ? "#b91c1c" : "var(--accent)" }}>
                 £{(plan.plan.total_estimated_low ?? 0).toFixed(2)}–£{(plan.plan.total_estimated_high ?? 0).toFixed(2)}
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-white/40">
+              <p className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
                 of £{plan.weeklyBudget} budget
               </p>
             </div>
-            <div className="rounded-xl bg-black/20 py-2">
+            <div className="rounded-xl py-2" style={{ backgroundColor: "var(--bg-muted)" }}>
               <p className="text-sm font-semibold">
                 <AnimatedNumber value={plan.plan.average_daily_calories ?? 0} /> kcal
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-white/40">avg / day</p>
+              <p className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+                avg / day
+              </p>
             </div>
           </div>
 
           {plan.plan.insight && (
-            <p className="mt-3 rounded-lg bg-white/5 p-3 text-xs text-white/70">{plan.plan.insight}</p>
+            <p className="mt-3 rounded-lg p-3 text-xs" style={{ backgroundColor: "var(--bg-muted)", color: "var(--text-secondary)" }}>
+              {plan.plan.insight}
+            </p>
           )}
 
           <div className="no-scrollbar mt-4 -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
             {(plan.plan.days ?? []).map((day, idx) => (
               <div
                 key={idx}
-                className="w-44 shrink-0 rounded-xl border border-white/10 bg-black/20 p-3"
+                className="w-44 shrink-0 rounded-xl border p-3"
+                style={{ borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-muted)" }}
               >
-                <p className="text-xs font-semibold text-white/80">{day.day}</p>
+                <p className="text-xs font-semibold">{day.day}</p>
                 <ul className="mt-2 flex flex-col gap-2">
                   {(day.meals ?? []).map((meal, mealIdx) => (
                     <li key={mealIdx} className="text-[11px]">
-                      <p className="text-white/40">{meal.type}</p>
-                      <p className="text-white/80">{meal.name}</p>
-                      <p className="text-white/40">
+                      <p style={{ color: "var(--text-secondary)" }}>{meal.type}</p>
+                      <p>{meal.name}</p>
+                      <p style={{ color: "var(--text-secondary)" }}>
                         {meal.calories} kcal · £{Number(meal.cost_low ?? 0).toFixed(2)}–£{Number(meal.cost_high ?? 0).toFixed(2)}
                       </p>
                     </li>
@@ -240,8 +250,8 @@ export default function MealPlan() {
           </div>
 
           {Array.isArray(plan.plan.shopping_list) && plan.plan.shopping_list.length > 0 && (
-            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs font-semibold text-white/80">Shopping list</p>
+            <div className="mt-4 rounded-xl border p-3" style={{ borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-muted)" }}>
+              <p className="text-xs font-semibold">Shopping list</p>
               <ul className="mt-2 flex flex-col gap-1.5">
                 {plan.plan.shopping_list.map((item, idx) => {
                   const checked = Boolean(checkedItems[idx]);
@@ -252,14 +262,17 @@ export default function MealPlan() {
                           type="checkbox"
                           checked={checked}
                           onChange={() => setCheckedItems((prev) => ({ ...prev, [idx]: !prev[idx] }))}
-                          className="h-4 w-4 shrink-0 rounded border-white/20 bg-transparent"
+                          className="h-4 w-4 shrink-0 rounded"
                           style={{ accentColor: "var(--accent)" }}
                         />
-                        <span className={`flex-1 text-xs ${checked ? "text-white/30 line-through" : "text-white/80"}`}>
+                        <span
+                          className="flex-1 text-xs"
+                          style={{ color: checked ? "var(--text-secondary)" : "var(--text-primary)", textDecoration: checked ? "line-through" : "none" }}
+                        >
                           {item.item}
-                          {item.quantity ? <span className="text-white/40"> · {item.quantity}</span> : null}
+                          {item.quantity ? <span style={{ color: "var(--text-secondary)" }}> · {item.quantity}</span> : null}
                         </span>
-                        <span className="shrink-0 text-[11px] text-white/40">
+                        <span className="shrink-0 text-[11px]" style={{ color: "var(--text-secondary)" }}>
                           £{Number(item.price_low ?? 0).toFixed(2)}–£{Number(item.price_high ?? 0).toFixed(2)}
                         </span>
                       </label>

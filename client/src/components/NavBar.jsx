@@ -2,64 +2,41 @@ import { useAppContext } from "../context/AppContext.jsx";
 
 const TABS = [
   {
-    id: "dashboard",
-    label: "Dashboard",
+    id: "home",
+    label: "Home",
     icon: (active) => (
       <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
         <path
-          d="M4 8l8-5 8 5v11a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1V8z"
+          d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-9z"
           stroke={active ? "var(--accent)" : "currentColor"}
           strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-        <circle
-          cx="16.5"
-          cy="7.5"
-          r="3.4"
-          fill={active ? "var(--accent)" : "#4c1d95"}
-          stroke="#0f0b1a"
-          strokeWidth="1"
-        />
-        <path
-          d="M15.1 7.5l1 1 1.8-1.9"
-          stroke="#fff"
-          strokeWidth="0.9"
-          strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
     ),
   },
   {
-    id: "workouts",
-    label: "Chat",
+    id: "maker",
+    label: "Maker",
     icon: (active) => (
       <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
         <path
-          d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4.4 3.3A.5.5 0 0 1 4 20V17H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"
+          d="M5 11a7 7 0 0 1 14 0v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7z"
           stroke={active ? "var(--accent)" : "currentColor"}
           strokeWidth="1.8"
           strokeLinejoin="round"
         />
-        <circle cx="8" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
-        <circle cx="12" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
-        <circle cx="16" cy="11" r="1.1" fill={active ? "var(--accent)" : "currentColor"} />
+        <path d="M9 7V4m3 3V3m3 4V4" stroke={active ? "var(--accent)" : "currentColor"} strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     ),
   },
   {
-    id: "progress",
-    label: "Progress",
+    id: "calendar",
+    label: "Calendar",
     icon: (active) => (
       <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
-        <path
-          d="M3 17l5-6 4 3 5-7 4 5"
-          stroke={active ? "var(--accent)" : "currentColor"}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path d="M3 21h18" stroke={active ? "var(--accent)" : "currentColor"} strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="3.5" y="5" width="17" height="15" rx="2" stroke={active ? "var(--accent)" : "currentColor"} strokeWidth="1.8" />
+        <path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke={active ? "var(--accent)" : "currentColor"} strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -85,7 +62,8 @@ export default function NavBar() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-stretch border-t border-white/10 bg-[#160f26]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-stretch border-t pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      style={{ borderColor: "var(--border-subtle)", backgroundColor: "color-mix(in srgb, var(--bg-card) 95%, transparent)" }}
       aria-label="Primary"
     >
       {TABS.map((tab) => {
@@ -96,7 +74,7 @@ export default function NavBar() {
             type="button"
             onClick={() => setActiveTab(tab.id)}
             className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium transition-all active:scale-90"
-            style={{ color: active ? "var(--accent)" : "rgba(255,255,255,0.5)" }}
+            style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
             aria-current={active ? "page" : undefined}
           >
             {tab.icon(active)}

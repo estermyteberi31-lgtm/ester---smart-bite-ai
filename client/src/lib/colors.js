@@ -3,7 +3,7 @@
 // STREAK_UNLOCK_DAYS). `contrast` is the text color to use on top of a
 // solid button/badge filled with this color.
 export const NEON_COLORS = [
-  { key: "green", label: "Green", hex: "#22c55e", contrast: "#000000", free: true },
+  { key: "green", label: "Green", hex: "#2f6b4a", contrast: "#ffffff", free: true },
   { key: "purple", label: "Purple", hex: "#a855f7", contrast: "#ffffff", free: false },
   { key: "white", label: "White", hex: "#ffffff", contrast: "#000000", free: false },
   { key: "pink", label: "Pink", hex: "#ec4899", contrast: "#ffffff", free: false },

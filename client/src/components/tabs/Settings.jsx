@@ -11,6 +11,7 @@ const DIET_OPTIONS = [
   "Keto",
   "Halal",
   "Kosher",
+  "Other",
 ];
 
 export default function Settings() {
@@ -82,7 +83,7 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="card-enter rounded-2xl border p-4" style={{ borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}>
         <div className="flex items-center gap-3">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
@@ -122,16 +123,19 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "60ms" }}>
+      <section
+        className="card-enter rounded-2xl border p-4"
+        style={{ "--delay": "60ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+      >
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white/80">Neon color</h3>
-          <span className="text-xs text-white/40">
+          <h3 className="text-sm font-semibold">Accent color</h3>
+          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
             <span className={streak.currentStreak > 0 ? "flame-pulse" : ""}>🔥</span> {streak.currentStreak}-day
             streak
           </span>
         </div>
 
-        <p className="mt-1 text-xs text-white/40">
+        <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>
           {streak.colorsUnlocked
             ? "All colors unlocked — nice streak!"
             : `Keep a daily streak going for ${daysToGo} more day${daysToGo === 1 ? "" : "s"} to unlock every color.`}
@@ -150,7 +154,7 @@ export default function Settings() {
                 className="relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform active:scale-90 disabled:active:scale-100"
                 style={{
                   backgroundColor: color.hex,
-                  borderColor: active ? "#ffffff" : "rgba(255,255,255,0.15)",
+                  borderColor: active ? "var(--accent)" : "var(--border-subtle)",
                   opacity: locked ? 0.35 : 1,
                 }}
                 aria-label={`${color.label}${locked ? " (locked)" : ""}`}
@@ -158,7 +162,7 @@ export default function Settings() {
               >
                 {locked && (
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-                    <rect x="5" y="11" width="14" height="9" rx="1.5" fill="#0f0b1a" fillOpacity="0.85" />
+                    <rect x="5" y="11" width="14" height="9" rx="1.5" fill="#15180f" fillOpacity="0.85" />
                     <path
                       d="M8 11V8a4 4 0 1 1 8 0v3"
                       stroke="#ffffff"
@@ -171,11 +175,14 @@ export default function Settings() {
             );
           })}
         </div>
-        {colorError && <p className="mt-2 text-xs text-red-400">{colorError}</p>}
+        {colorError && <p className="mt-2 text-xs text-red-500">{colorError}</p>}
       </section>
 
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "120ms" }}>
-        <h3 className="text-sm font-semibold text-white/80">Dietary preferences</h3>
+      <section
+        className="card-enter rounded-2xl border p-4"
+        style={{ "--delay": "120ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+      >
+        <h3 className="text-sm font-semibold">Dietary preferences</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {DIET_OPTIONS.map((option) => {
             const active = (form.dietary_preferences ?? []).includes(option);
@@ -188,7 +195,7 @@ export default function Settings() {
                 style={
                   active
                     ? { backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }
-                    : { color: "rgba(255,255,255,0.5)", backgroundColor: "rgba(255,255,255,0.05)" }
+                    : { color: "var(--text-secondary)", backgroundColor: "var(--bg-muted)" }
                 }
               >
                 {option}
@@ -198,9 +205,12 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "150ms" }}>
-        <h3 className="text-sm font-semibold text-white/80">Tell the AI about you</h3>
-        <p className="mt-1 text-xs text-white/40">
+      <section
+        className="card-enter rounded-2xl border p-4"
+        style={{ "--delay": "150ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+      >
+        <h3 className="text-sm font-semibold">Tell Bite about you</h3>
+        <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>
           Anything the chat and meal planner should know — age, training schedule, foods you hate,
           intolerances not covered above, anything.
         </p>
@@ -212,11 +222,16 @@ export default function Settings() {
           placeholder={"e.g. I'm 19, trying to lose weight, I hate fish, I train 4x a week, I'm lactose intolerant..."}
           className="input mt-3 resize-none"
         />
-        <p className="mt-1 text-right text-[10px] text-white/30">{(form.custom_notes ?? "").length}/2000</p>
+        <p className="mt-1 text-right text-[10px]" style={{ color: "var(--text-secondary)" }}>
+          {(form.custom_notes ?? "").length}/2000
+        </p>
       </section>
 
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "180ms" }}>
-        <h3 className="text-sm font-semibold text-white/80">Goals</h3>
+      <section
+        className="card-enter rounded-2xl border p-4"
+        style={{ "--delay": "180ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+      >
+        <h3 className="text-sm font-semibold">Goals</h3>
         <div className="mt-3 flex flex-col gap-3">
           <Field label="Daily calorie goal">
             <input
@@ -250,28 +265,35 @@ export default function Settings() {
         </div>
       </section>
 
-      <section className="card-enter rounded-2xl border border-white/10 bg-white/[0.03] p-4" style={{ "--delay": "200ms" }}>
-        <h3 className="text-sm font-semibold text-white/80">Past meal plans</h3>
-        <p className="mt-1 text-xs text-white/40">Every weekly plan you've generated, newest first.</p>
+      <section
+        className="card-enter rounded-2xl border p-4"
+        style={{ "--delay": "200ms", borderColor: "var(--border-subtle)", backgroundColor: "var(--bg-card)" }}
+      >
+        <h3 className="text-sm font-semibold">Past meal plans</h3>
+        <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+          Every weekly plan you've generated, newest first.
+        </p>
         {loadingPlanHistory ? (
           <div className="mt-3 flex flex-col gap-2">
             <div className="skeleton h-14 rounded-xl" />
             <div className="skeleton h-14 rounded-xl" />
           </div>
         ) : planHistory.length === 0 ? (
-          <p className="mt-3 text-xs text-white/30">No plans generated yet — build one from the Dashboard.</p>
+          <p className="mt-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+            No plans generated yet — build one from the Maker tab.
+          </p>
         ) : (
           <ul className="mt-3 flex flex-col gap-2">
             {planHistory.map((entry) => (
-              <li key={entry.id} className="rounded-xl bg-black/20 p-3 text-xs">
+              <li key={entry.id} className="rounded-xl p-3 text-xs" style={{ backgroundColor: "var(--bg-muted)" }}>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-white/80">{formatPlanDate(entry.createdAt)}</span>
-                  <span className="text-white/50">
+                  <span className="font-medium">{formatPlanDate(entry.createdAt)}</span>
+                  <span style={{ color: "var(--text-secondary)" }}>
                     £{Number(entry.plan?.total_estimated_low ?? 0).toFixed(2)}–£
                     {Number(entry.plan?.total_estimated_high ?? 0).toFixed(2)}
                   </span>
                 </div>
-                <p className="mt-1 text-white/40">
+                <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
                   {entry.calorieGoal} kcal/day goal · £{entry.weeklyBudget} budget
                 </p>
               </li>
@@ -285,12 +307,16 @@ export default function Settings() {
         onClick={handleSave}
         disabled={saving}
         className="glow-accent rounded-xl py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
-        style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+        style={{ backgroundColor: "var(--cta)", color: "var(--cta-contrast)" }}
       >
         {saving ? "Saving..." : "Save settings"}
       </button>
-      {savedAt && !error && <p className="text-center text-xs text-green-400">Settings saved.</p>}
-      {error && <p className="text-center text-xs text-red-400">{error}</p>}
+      {savedAt && !error && (
+        <p className="text-center text-xs" style={{ color: "var(--accent)" }}>
+          Settings saved.
+        </p>
+      )}
+      {error && <p className="text-center text-xs text-red-500">{error}</p>}
     </div>
   );
 }
@@ -298,7 +324,9 @@ export default function Settings() {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-white/50">{label}</span>
+      <span className="mb-1 block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
+        {label}
+      </span>
       {children}
     </label>
   );

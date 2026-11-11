@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
   calorie_goal: 2200,
   weekly_budget: 60,
   preferred_gym_mode: "home",
-  accent_color: "purple",
+  accent_color: "green",
   custom_notes: "",
   onboarding_completed: false,
   goal: "",
@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS = {
 const DEFAULT_STREAK = { currentStreak: 0, unlockAt: 7, colorsUnlocked: false };
 
 export function AppProvider({ children }) {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("home");
   const [gymMode, setGymMode] = useState("home");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [hydrationToday, setHydrationToday] = useState(0);

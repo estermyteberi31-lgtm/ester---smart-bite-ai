@@ -7,10 +7,24 @@
 }
 
 :root {
-  /* Default neon accent (Green) — overridden at runtime from the user's
-     saved preference via applyAccentColor() in lib/colors.js. */
-  --accent: #22c55e;
-  --accent-contrast: #000000;
+  /* Accent (Green) — overridden at runtime from the user's saved
+     preference via applyAccentColor() in lib/colors.js. */
+  --accent: #2f6b4a;
+  --accent-contrast: #ffffff;
+  --accent-soft: #e3ede6;
+
+  /* Primary CTA buttons are deliberately black, not green — matches the
+     clean "premium" look the app is going for (white/sage/forest-green
+     surfaces with high-contrast black buttons). */
+  --cta: #14160f;
+  --cta-contrast: #ffffff;
+
+  --bg-page: #f4f7f2;
+  --bg-card: #ffffff;
+  --bg-muted: #edf2ea;
+  --text-primary: #15180f;
+  --text-secondary: #5c6759;
+  --border-subtle: #e1e8dc;
 }
 
 html,
@@ -20,7 +34,8 @@ body,
 }
 
 body {
-  background-color: #0f0b1a;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
 }
@@ -36,7 +51,14 @@ body {
 
 @layer components {
   .input {
-    @apply w-full rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white placeholder:text-white/30 focus:outline-none;
+    @apply w-full rounded-xl border p-3 text-sm focus:outline-none;
+    border-color: var(--border-subtle);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+  }
+  .input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
   }
   .input:focus {
     border-color: var(--accent);
@@ -50,21 +72,21 @@ body {
 
   /* Soft colored glow behind primary accent-filled buttons. */
   .glow-accent {
-    box-shadow: 0 10px 28px -10px color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 10px 24px -10px rgba(20, 22, 15, 0.35);
   }
 
   /* Shimmering placeholder for content that's still loading. */
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(20, 22, 15, 0.06);
   }
   .skeleton::after {
     content: "";
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    background: linear-gradient(90deg, transparent, rgba(20, 22, 15, 0.08), transparent);
     animation: shimmer 1.4s ease-in-out infinite;
   }
 
